@@ -17,6 +17,7 @@ export type AuthStackParamList = {
   Register: undefined;
   ForgotPassword: undefined;
   VerifyEmail: { email: string };
+  ResetPassword: undefined;
 };
 
 // Client Navigator

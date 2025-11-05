@@ -1,134 +1,194 @@
-# Barbershop Manager
+# 💈 Barbershop Manager
 
-Una aplicación móvil multiplataforma para la gestión de barberías construida con React Native y Expo SDK 54.
+Sistema de gestión para barberías desarrollado con React Native y Expo.
 
 ## 🚀 Características
 
-- **Multi-rol**: Soporte para súper administradores, administradores de barbería, barberos y clientes
-- **Gestión de Citas**: Sistema completo de agendamiento con disponibilidad en tiempo real
-- **Lista de Espera**: Notificaciones automáticas cuando se libera un horario
-- **Notificaciones Push**: Recordatorios y actualizaciones en tiempo real
-- **Temas**: Soporte para modo claro y oscuro
-- **Geolocalización**: Búsqueda de barberías cercanas
-- **Estadísticas**: Dashboards con métricas y reportes
+- ✅ Sistema de autenticación con roles (Cliente, Barbero, Admin, Super Admin)
+- ✅ Gestión de citas y reservas
+- ✅ Perfiles de usuario personalizados
+- ✅ Recuperación de contraseña por email
+- ✅ Notificaciones Toast profesionales
+- ✅ Tema claro/oscuro
+- ✅ Base de datos Supabase
 
-## 📋 Requisitos Previos
+## 📦 Tecnologías
 
-- Node.js 18+ 
-- npm o yarn
-- Expo CLI
-- Cuenta de Supabase (para backend)
+- **React Native** - Framework móvil
+- **Expo** - Herramientas de desarrollo
+- **TypeScript** - Tipado estático
+- **Supabase** - Backend y base de datos
+- **Zustand** - Gestión de estado
+- **React Navigation** - Navegación
+- **React Query** - Gestión de datos
+- **Toast Messages** - Notificaciones
 
 ## 🛠️ Instalación
 
-1. Clonar el repositorio:
 ```bash
-git clone <repository-url>
-cd barbershop-manager
-```
-
-2. Instalar dependencias:
-```bash
+# Instalar dependencias
 npm install
+
+# Iniciar en desarrollo
+npx expo start
+
+# Limpiar caché
+npx expo start -c
 ```
 
-3. Configurar variables de entorno:
+## 🔐 Configuración de Supabase
+
+### Variables de Entorno
+
+Crea un archivo `.env` con:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=tu_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
+```
+
+### Scripts SQL Importantes
+
+Los scripts SQL están en la carpeta `supabase/`:
+
+- `setup-admin-system.sql` - Configuración inicial del sistema
+- `create-super-admin-user.sql` - Crear super administrador
+- `rls-policies.sql` - Políticas de seguridad
+- `storage-setup.sql` - Configuración de almacenamiento
+
+## 📱 Recuperación de Contraseña
+
+La página web para recuperación de contraseña está en `public/index.html`.
+
+### Deployment en Vercel
+
 ```bash
-cp .env.example .env
+cd public
+vercel --prod
 ```
 
-Editar `.env` con tus credenciales de Supabase:
+Luego configura la URL en Supabase:
+- Authentication → URL Configuration → Redirect URLs
+- Agrega: `https://tu-proyecto.vercel.app/`
+
+## 👥 Roles de Usuario
+
+### Cliente
+- Ver barberías y barberos
+- Reservar citas
+- Ver historial de citas
+- Gestionar perfil
+
+### Barbero
+- Ver citas asignadas
+- Gestionar disponibilidad
+- Ver historial de clientes
+
+### Admin
+- Gestionar barberos
+- Ver estadísticas de la barbería
+- Configurar servicios
+
+### Super Admin
+- Gestión completa de barberías
+- Gestión de todos los usuarios
+- Estadísticas globales
+- Configuración del sistema
+
+## 📂 Estructura del Proyecto
+
 ```
-EXPO_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_de_supabase
+src/
+├── components/     # Componentes reutilizables
+├── hooks/          # Custom hooks
+├── navigation/     # Configuración de navegación
+├── screens/        # Pantallas de la app
+│   ├── auth/       # Autenticación
+│   ├── client/     # Cliente
+│   ├── barber/     # Barbero
+│   ├── admin/      # Admin
+│   └── superadmin/ # Super Admin
+├── services/       # Servicios (API, auth, etc.)
+├── store/          # Estado global (Zustand)
+├── styles/         # Estilos y temas
+├── supabase/       # Configuración de Supabase
+├── types/          # Tipos de TypeScript
+└── utils/          # Utilidades
+
+supabase/           # Scripts SQL
+public/             # Página web de recuperación
 ```
 
-4. Iniciar el servidor de desarrollo:
+## 🎨 Notificaciones Toast
+
+Usa el helper `showToast` para notificaciones profesionales:
+
+```typescript
+import { showToast } from './src/utils/toast';
+
+// Éxito
+showToast.success('Operación completada', '✅ Éxito');
+
+// Error
+showToast.error('Algo salió mal', '❌ Error');
+
+// Info
+showToast.info('Información importante', 'ℹ️ Info');
+
+// Cargando
+showToast.loading('Procesando...');
+```
+
+## 🔧 Scripts Útiles
+
 ```bash
+# Desarrollo
 npm start
-```
 
-## 📱 Ejecutar en Dispositivos
+# Limpiar caché
+npm start -- --clear
 
-### Android
-```bash
+# Android
 npm run android
-```
 
-### iOS
-```bash
+# iOS
 npm run ios
-```
 
-### Web
-```bash
+# Web
 npm run web
 ```
 
-## 🏗️ Estructura del Proyecto
+## 📝 Notas Importantes
 
-```
-barbershop-manager/
-├── src/
-│   ├── components/       # Componentes reutilizables
-│   │   ├── common/       # Botones, inputs, cards, modals
-│   │   ├── barbershop/   # Componentes específicos de barberías
-│   │   ├── appointment/  # Componentes de citas
-│   │   └── layout/       # Headers, footers, containers
-│   ├── screens/          # Pantallas de la app
-│   │   ├── auth/         # Login, registro, verificación
-│   │   ├── client/       # Pantallas del cliente
-│   │   ├── barber/       # Pantallas del barbero
-│   │   ├── admin/        # Pantallas del admin de barbería
-│   │   └── superadmin/   # Pantallas del súper admin
-│   ├── navigation/       # Configuración de navegación
-│   ├── hooks/            # Custom hooks
-│   ├── services/         # Servicios de API
-│   ├── supabase/         # Configuración de Supabase
-│   ├── store/            # Estado global con Zustand
-│   ├── utils/            # Utilidades
-│   ├── styles/           # Estilos globales y tema
-│   ├── assets/           # Imágenes, iconos, fuentes
-│   └── types/            # TypeScript types
-├── App.tsx               # Punto de entrada
-├── app.json              # Configuración de Expo
-├── tsconfig.json         # Configuración de TypeScript
-└── tailwind.config.js    # Configuración de Tailwind
-```
+- Las políticas RLS están configuradas para seguridad
+- Los usuarios deben verificar su email al registrarse
+- Las contraseñas están encriptadas con bcrypt
+- Los enlaces de recuperación expiran en 1 hora
 
-## 🔧 Stack Tecnológico
+## 🐛 Solución de Problemas
 
-- **Framework**: React Native con Expo SDK 54
-- **Backend**: Supabase (Auth, PostgreSQL, Storage)
-- **Navegación**: React Navigation v6
-- **Estado Global**: Zustand + React Query
-- **Estilos**: NativeWind (Tailwind para React Native)
-- **Fechas**: date-fns
-- **Almacenamiento Local**: AsyncStorage
-- **Notificaciones**: Expo Notifications
-- **Imágenes**: Expo Image Picker + Expo Image
+### Error al iniciar sesión
+- Verifica que las políticas RLS estén configuradas
+- Ejecuta `supabase/rls-policies.sql`
 
-## 📚 Documentación
+### Error de recursión infinita
+- Las políticas RLS están mal configuradas
+- Ejecuta el script de limpieza de políticas
 
-Para más información sobre el diseño y arquitectura del proyecto, consulta:
-- [Requisitos](.kiro/specs/barbershop-management-app/requirements.md)
-- [Diseño](.kiro/specs/barbershop-management-app/design.md)
-- [Plan de Implementación](.kiro/specs/barbershop-management-app/tasks.md)
-
-## 🧪 Testing
-
-```bash
-# Verificar tipos de TypeScript
-npm run type-check
-
-# Ejecutar linter
-npm run lint
-```
+### Email de recuperación no llega
+- Verifica la configuración de SMTP en Supabase
+- Revisa la carpeta de spam
+- Verifica que el email esté registrado
 
 ## 📄 Licencia
 
 Este proyecto es privado y confidencial.
 
-## 👥 Equipo
+## 👨‍💻 Desarrollo
 
-Desarrollado para la gestión eficiente de barberías.
+Desarrollado con ❤️ para gestión profesional de barberías.
+
+---
+
+**Versión**: 1.0.0  
+**Última actualización**: 2025-01-05

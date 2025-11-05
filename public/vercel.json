@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "name": "barbershop-manager-reset",
+  "builds": [
+    {
+      "src": "reset-password.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/reset-password",
+      "dest": "/reset-password.html"
+    },
+    {
+      "src": "/",
+      "dest": "/reset-password.html"
+    }
+  ]
+}

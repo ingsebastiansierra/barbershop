@@ -1,5 +1,6 @@
 /**
- * Color palette for light and dark themes
+ * Color Palette for Light and Dark Themes
+ * Based on design system specifications
  */
 
 export const lightColors = {
@@ -66,4 +67,4 @@ export const darkColors = {
   divider: '#1F2937',        // Gray-800
 } as const;
 
-export type ColorPalette = typeof lightColors;
+export type ColorScheme = typeof lightColors;

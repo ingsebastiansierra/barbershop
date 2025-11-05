@@ -1,65 +1,74 @@
 /**
- * Theme configuration including typography, spacing, and shadows
+ * Theme System
+ * Typography, spacing, border radius, shadows, and animations
  */
 
+import { TextStyle } from 'react-native';
+
+/**
+ * Typography System
+ */
 export const typography = {
   // Headings
   h1: {
     fontSize: 32,
-    fontWeight: '700' as const,
+    fontWeight: '700' as TextStyle['fontWeight'],
     lineHeight: 40,
   },
   h2: {
     fontSize: 28,
-    fontWeight: '700' as const,
+    fontWeight: '700' as TextStyle['fontWeight'],
     lineHeight: 36,
   },
   h3: {
     fontSize: 24,
-    fontWeight: '600' as const,
+    fontWeight: '600' as TextStyle['fontWeight'],
     lineHeight: 32,
   },
   h4: {
     fontSize: 20,
-    fontWeight: '600' as const,
+    fontWeight: '600' as TextStyle['fontWeight'],
     lineHeight: 28,
   },
   
   // Body
   bodyLarge: {
     fontSize: 16,
-    fontWeight: '400' as const,
+    fontWeight: '400' as TextStyle['fontWeight'],
     lineHeight: 24,
   },
   bodyMedium: {
     fontSize: 14,
-    fontWeight: '400' as const,
+    fontWeight: '400' as TextStyle['fontWeight'],
     lineHeight: 20,
   },
   bodySmall: {
     fontSize: 12,
-    fontWeight: '400' as const,
+    fontWeight: '400' as TextStyle['fontWeight'],
     lineHeight: 16,
   },
   
   // Labels
   labelLarge: {
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600' as TextStyle['fontWeight'],
     lineHeight: 20,
   },
   labelMedium: {
     fontSize: 12,
-    fontWeight: '600' as const,
+    fontWeight: '600' as TextStyle['fontWeight'],
     lineHeight: 16,
   },
   labelSmall: {
     fontSize: 10,
-    fontWeight: '600' as const,
+    fontWeight: '600' as TextStyle['fontWeight'],
     lineHeight: 14,
   },
 } as const;
 
+/**
+ * Spacing System
+ */
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -69,6 +78,9 @@ export const spacing = {
   xxl: 48,
 } as const;
 
+/**
+ * Border Radius System
+ */
 export const borderRadius = {
   sm: 4,
   md: 8,
@@ -77,6 +89,9 @@ export const borderRadius = {
   full: 9999,
 } as const;
 
+/**
+ * Shadow System
+ */
 export const shadows = {
   sm: {
     shadowColor: '#000',
@@ -101,8 +116,20 @@ export const shadows = {
   },
 } as const;
 
+/**
+ * Animation Timings
+ */
 export const animations = {
   fast: 150,
   normal: 250,
   slow: 350,
 } as const;
+
+/**
+ * Complete Theme Type
+ */
+export type Typography = typeof typography;
+export type Spacing = typeof spacing;
+export type BorderRadius = typeof borderRadius;
+export type Shadows = typeof shadows;
+export type Animations = typeof animations;
