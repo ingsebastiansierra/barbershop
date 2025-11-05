@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Barbershop Manager",
+    "slug": "barbershop-manager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#6366F1"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.barbershop.manager"
+    },
+    "android": {
+      "package": "com.barbershop.manager",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      "expo-notifications",
+      "expo-image-picker",
+      "expo-location"
+    ]
+  }
+}
