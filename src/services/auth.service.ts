@@ -29,8 +29,8 @@ export class AuthService {
   async register(
     email: string,
     password: string,
-    nombre: string,
-    telefono: string
+    full_name: string,
+    phone: string
   ): Promise<Usuario> {
     // Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -38,8 +38,8 @@ export class AuthService {
       password,
       options: {
         data: {
-          nombre,
-          telefono,
+          full_name,
+          phone,
         },
       },
     });
@@ -52,16 +52,18 @@ export class AuthService {
       throw new Error('No user returned from registration');
     }
 
-    // Create user profile using database function (bypasses RLS)
-    const { data: userData, error: userError } = await supabase.rpc(
-      'handle_new_user_registration',
-      {
-        user_id: authData.user.id,
-        user_email: email,
-        user_nombre: nombre,
-        user_telefono: telefono,
-      }
-    );
+    // Create user profile in users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .insert({
+        id: authData.user.id,
+        email: email,
+        full_name: full_name,
+        phone: phone,
+        role: 'client',
+      })
+      .select()
+      .single();
 
     if (userError) {
       throw new Error(userError.message);
@@ -129,9 +131,9 @@ export class AuthService {
 
       console.log('Auth user found:', authUser.id, authUser.email);
 
-      // Get user profile from usuarios table
+      // Get user profile from users table
       const { data: userData, error: userError } = await supabase
-        .from('usuarios')
+        .from('users')
         .select('*')
         .eq('id', authUser.id)
         .single();
@@ -148,7 +150,7 @@ export class AuthService {
         return null;
       }
 
-      console.log('User profile found:', userData.email, userData.rol);
+      console.log('User profile found:', userData.email, userData.role);
       return userData as Usuario;
     } catch (error) {
       console.error('Unexpected error in getCurrentUser:', error);
@@ -169,7 +171,7 @@ export class AuthService {
     };
 
     const { data, error } = await supabase
-      .from('usuarios')
+      .from('users')
       .update(updateData as any)
       .eq('id', userId)
       .select()

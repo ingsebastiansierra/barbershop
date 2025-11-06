@@ -3,7 +3,7 @@
  * Screen for user registration
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation';
@@ -22,6 +23,8 @@ import { Input } from '../../components/common/Input';
 import { useThemeStore } from '../../store/themeStore';
 import { typography, spacing } from '../../styles/theme';
 import { validateEmail, validatePassword, getPasswordError, validatePhone } from '../../utils/validation';
+import { supabase } from '../../supabase/client';
+import { barberService } from '../../services/barber.service';
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -43,12 +46,44 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [userType, setUserType] = useState<'client' | 'barber'>('client');
+  const [selectedBarbershopId, setSelectedBarbershopId] = useState<string>('');
+  const [barbershops, setBarbershops] = useState<Array<{ id: string; name: string }>>([]);
 
   const [nombreError, setNombreError] = useState<string>();
   const [emailError, setEmailError] = useState<string>();
   const [telefonoError, setTelefonoError] = useState<string>();
   const [passwordError, setPasswordError] = useState<string>();
   const [confirmPasswordError, setConfirmPasswordError] = useState<string>();
+  const [barbershopError, setBarbershopError] = useState<string>();
+  const [loadingBarbershops, setLoadingBarbershops] = useState(false);
+
+  // Load barbershops when user selects barber type
+  useEffect(() => {
+    if (userType === 'barber') {
+      loadBarbershops();
+    }
+  }, [userType]);
+
+  const loadBarbershops = async () => {
+    try {
+      setLoadingBarbershops(true);
+      const { data, error } = await supabase
+        .from('barbershops')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+
+      setBarbershops(data || []);
+    } catch (error) {
+      console.error('Error loading barbershops:', error);
+      Alert.alert('Error', 'No se pudieron cargar las barberías');
+    } finally {
+      setLoadingBarbershops(false);
+    }
+  };
 
   const validateForm = (): boolean => {
     let isValid = true;
@@ -109,6 +144,16 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       setConfirmPasswordError(undefined);
     }
 
+    // Validate barbershop selection if user is barber
+    if (userType === 'barber') {
+      if (!selectedBarbershopId) {
+        setBarbershopError('Selecciona una barbería');
+        isValid = false;
+      } else {
+        setBarbershopError(undefined);
+      }
+    }
+
     return isValid;
   };
 
@@ -118,19 +163,66 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     try {
-      await register(email.trim(), password, nombre.trim(), telefono.trim());
-      
-      // Show success message
-      Alert.alert(
-        'Registro exitoso',
-        'Se ha enviado un email de verificación a tu correo. Por favor verifica tu cuenta antes de iniciar sesión.',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('VerifyEmail', { email: email.trim() }),
+      if (userType === 'client') {
+        // Register as client (normal flow)
+        await register(email.trim(), password, nombre.trim(), telefono.trim());
+        
+        Alert.alert(
+          'Registro exitoso',
+          'Se ha enviado un email de verificación a tu correo. Por favor verifica tu cuenta antes de iniciar sesión.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('VerifyEmail', { email: email.trim() }),
+            },
+          ]
+        );
+      } else {
+        // Register as barber with pending status
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            data: {
+              full_name: nombre.trim(),
+              phone: telefono.trim(),
+              role: 'barber',
+              barbershop_id: selectedBarbershopId,
+            },
           },
-        ]
-      );
+        });
+
+        if (authError) throw authError;
+        if (!authData.user) throw new Error('No se pudo crear el usuario');
+
+        // Wait a moment for auth to complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Create user profile using service role via RPC function
+        const { error: profileError } = await supabase.rpc('create_barber_profile', {
+          p_user_id: authData.user.id,
+          p_email: email.trim(),
+          p_full_name: nombre.trim(),
+          p_phone: telefono.trim(),
+          p_barbershop_id: selectedBarbershopId,
+        });
+
+        if (profileError) {
+          console.error('Error creating barber profile:', profileError);
+          // Don't throw error, the trigger might have created it
+        }
+
+        Alert.alert(
+          '¡Solicitud Enviada!',
+          'Tu solicitud para trabajar como barbero ha sido enviada. El administrador de la barbería la revisará pronto.\n\nRecibirás una notificación cuando sea aprobada.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Login'),
+            },
+          ]
+        );
+      }
     } catch (error: any) {
       Alert.alert(
         'Error al registrarse',
@@ -163,6 +255,119 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         </View>
 
         <View style={styles.form}>
+          {/* User Type Selector */}
+          <View style={styles.selectorContainer}>
+            <Text style={[styles.selectorLabel, { color: colors.textPrimary }]}>
+              ¿Cómo te quieres registrar?
+            </Text>
+            <View style={styles.typeButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  {
+                    backgroundColor: userType === 'client' ? colors.primary : colors.surface,
+                    borderColor: userType === 'client' ? colors.primary : colors.border,
+                  },
+                ]}
+                onPress={() => setUserType('client')}
+                disabled={isLoading}
+              >
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    { color: userType === 'client' ? '#FFFFFF' : colors.textPrimary },
+                  ]}
+                >
+                  👤 Cliente
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  {
+                    backgroundColor: userType === 'barber' ? colors.primary : colors.surface,
+                    borderColor: userType === 'barber' ? colors.primary : colors.border,
+                  },
+                ]}
+                onPress={() => setUserType('barber')}
+                disabled={isLoading}
+              >
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    { color: userType === 'barber' ? '#FFFFFF' : colors.textPrimary },
+                  ]}
+                >
+                  ✂️ Barbero
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Barbershop Selector (only for barbers) */}
+          {userType === 'barber' && (
+            <View style={styles.barbershopSelector}>
+              <Text style={[styles.selectorLabel, { color: colors.textPrimary }]}>
+                Selecciona la barbería
+              </Text>
+              {loadingBarbershops ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <ScrollView
+                  style={styles.barbershopList}
+                  nestedScrollEnabled
+                  showsVerticalScrollIndicator={false}
+                >
+                  {barbershops.map((barbershop) => (
+                    <TouchableOpacity
+                      key={barbershop.id}
+                      style={[
+                        styles.barbershopItem,
+                        {
+                          backgroundColor:
+                            selectedBarbershopId === barbershop.id
+                              ? colors.primary + '20'
+                              : colors.surface,
+                          borderColor:
+                            selectedBarbershopId === barbershop.id
+                              ? colors.primary
+                              : colors.border,
+                        },
+                      ]}
+                      onPress={() => {
+                        setSelectedBarbershopId(barbershop.id);
+                        setBarbershopError(undefined);
+                      }}
+                      disabled={isLoading}
+                    >
+                      <Text
+                        style={[
+                          styles.barbershopName,
+                          {
+                            color:
+                              selectedBarbershopId === barbershop.id
+                                ? colors.primary
+                                : colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        {barbershop.name}
+                      </Text>
+                      {selectedBarbershopId === barbershop.id && (
+                        <Text style={{ color: colors.primary }}>✓</Text>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+              {barbershopError && (
+                <Text style={[styles.errorText, { color: colors.error }]}>
+                  {barbershopError}
+                </Text>
+              )}
+            </View>
+          )}
+
           <Input
             label="Nombre Completo"
             value={nombre}
@@ -331,5 +536,53 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     ...typography.labelLarge,
+  },
+  selectorContainer: {
+    marginBottom: spacing.lg,
+  },
+  selectorLabel: {
+    ...typography.labelLarge,
+    marginBottom: spacing.sm,
+  },
+  typeButtons: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  typeButton: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    borderRadius: 8,
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  typeButtonText: {
+    ...typography.labelLarge,
+    fontWeight: '600',
+  },
+  barbershopSelector: {
+    marginBottom: spacing.lg,
+  },
+  barbershopList: {
+    maxHeight: 200,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
+  },
+  barbershopItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  barbershopName: {
+    ...typography.bodyMedium,
+    fontWeight: '500',
+  },
+  errorText: {
+    ...typography.bodySmall,
+    marginTop: spacing.xs,
   },
 });

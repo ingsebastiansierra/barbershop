@@ -19,8 +19,8 @@ interface AuthState {
   register: (
     email: string,
     password: string,
-    nombre: string,
-    telefono: string
+    full_name: string,
+    phone: string
   ) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<Usuario>) => Promise<void>;
@@ -87,13 +87,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (
     email: string,
     password: string,
-    nombre: string,
-    telefono: string
+    full_name: string,
+    phone: string
   ) => {
     try {
       set({ isLoading: true });
 
-      await authService.register(email, password, nombre, telefono);
+      await authService.register(email, password, full_name, phone);
 
       // After registration, user needs to verify email
       // So we don't automatically log them in

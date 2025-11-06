@@ -69,10 +69,15 @@ export const RootNavigator: React.FC = () => {
       return 'Auth';
     }
 
+    // Get role from either 'role' or 'rol' field for compatibility
+    const userRole = user.role || user.rol;
+
     // Route based on user role
-    switch (user.rol) {
+    switch (userRole) {
+      case 'client':
       case 'cliente':
         return 'Client';
+      case 'barber':
       case 'barbero':
         return 'Barber';
       case 'admin':
@@ -81,6 +86,7 @@ export const RootNavigator: React.FC = () => {
         return 'SuperAdmin';
       default:
         // Default to client if role is not recognized
+        console.warn('Unknown user role:', userRole);
         return 'Client';
     }
   };
@@ -141,17 +147,17 @@ export const RootNavigator: React.FC = () => {
         ) : (
           // Show appropriate navigator based on user role
           <>
-            {user.rol === 'cliente' && (
+            {((user.role || user.rol) === 'client' || (user.role || user.rol) === 'cliente') && (
               <Stack.Screen name="Client" component={ClientNavigator} />
             )}
-            {user.rol === 'barbero' && (
+            {((user.role || user.rol) === 'barber' || (user.role || user.rol) === 'barbero') && (
               <Stack.Screen name="Barber" component={BarberNavigator} />
             )}
-            {user.rol === 'admin' && (
+            {(user.role || user.rol) === 'admin' && (
               <Stack.Screen name="Admin" component={AdminNavigator} />
             )}
-            {user.rol === 'super_admin' && (
-              <Stack.Screen name="SuperAdmin" component={SuperAdminNavigator} />
+            {(user.role || user.rol) === 'super_admin' && (
+              <Stack.Screen name="Admin" component={SuperAdminNavigator} />
             )}
           </>
         )}

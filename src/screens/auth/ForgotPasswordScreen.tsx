@@ -45,12 +45,10 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
       setIsLoading(true);
       showToast.loading('Enviando email de recuperación...');
 
-      // Enviar email de recuperación con página web intermedia (Vercel)
+      // Enviar email de recuperación
+      // Para desarrollo, no especificamos redirectTo y manejamos el reset en la app
       const { error } = await supabase.auth.resetPasswordForEmail(
-        email.toLowerCase().trim(),
-        {
-          redirectTo: 'https://proyecto-barber-paginas.vercel.app/',
-        }
+        email.toLowerCase().trim()
       );
 
       if (error) {

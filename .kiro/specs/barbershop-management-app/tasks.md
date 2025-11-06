@@ -176,8 +176,15 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - _Requirements: 2.3, 2.5_
 
 
-- [ ] 6. Implementar modelos de datos y servicios de Supabase
-  - [ ] 6.1 Crear scripts de base de datos
+- [x] 6. Implementar modelos de datos y servicios de Supabase
+
+
+
+
+
+  - [x] 6.1 Crear scripts de base de datos
+
+
     - Crear archivo SQL para tabla users con campos y RLS policies
     - Crear tabla barbershops con relaciones y policies
     - Crear tabla barbers con schedule JSON y policies
@@ -188,34 +195,49 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Crear tabla admin_assignments para asignaciones de admins
     - _Requirements: 2.1, 2.2, 2.4, 3.2, 4.2, 5.2, 6.3, 7.1, 8.2, 12.4_
 
-  - [ ] 6.2 Definir tipos TypeScript para modelos
+  - [x] 6.2 Definir tipos TypeScript para modelos
+
+
     - Crear interfaces en src/types/models.ts para User, Barbershop, Barber, Service, Appointment, WaitlistEntry, Notification
     - Definir tipos para OpeningHours, BarberSchedule, TimeRange, TimeSlot
     - Exportar enums para roles, estados de cita, métodos de pago
     - _Requirements: 2.1_
 
-  - [ ] 6.3 Implementar BarbershopService
+  - [x] 6.3 Implementar BarbershopService
+
+
     - Crear src/services/barbershop.service.ts con métodos CRUD
     - Implementar getBarbershops, getBarbershopById, getNearbyBarbershops
     - Implementar createBarbershop, updateBarbershop, deleteBarbershop
     - Implementar uploadLogo con Supabase Storage
     - _Requirements: 3.1, 3.2, 3.3, 3.5, 13.1, 15.2, 15.3_
 
-  - [ ] 6.4 Implementar BarberService
+  - [x] 6.4 Implementar BarberService
+
+
     - Crear src/services/barber.service.ts con métodos para gestionar barberos
     - Implementar getBarbers, getBarberById, createBarber, updateBarber
     - Implementar métodos para gestionar schedule de barberos
     - Implementar uploadPhoto con Supabase Storage
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 14.2, 14.3_
 
-  - [ ] 6.5 Implementar ServiceService
+  - [x] 6.5 Implementar ServiceService
+
+
     - Crear src/services/service.service.ts para gestión de servicios
     - Implementar getServices, getServiceById, createService, updateService, deleteService
     - Agregar lógica para manejar combos de servicios
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 7. Implementar sistema de citas y disponibilidad
-  - [ ] 7.1 Crear AppointmentService
+- [x] 7. Implementar sistema de citas y disponibilidad
+
+
+
+
+
+  - [x] 7.1 Crear AppointmentService
+
+
     - Implementar src/services/appointment.service.ts con métodos CRUD
     - Implementar getAppointments con filtros por usuario y rol
     - Implementar createAppointment con validación de disponibilidad
@@ -223,29 +245,42 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Agregar método getAvailableSlots que calcule horarios disponibles
     - _Requirements: 6.1, 6.2, 6.3, 6.5, 6.6, 7.1, 7.2, 7.3, 7.4, 7.5_
 
-  - [ ] 7.2 Implementar lógica de cálculo de disponibilidad
+  - [x] 7.2 Implementar lógica de cálculo de disponibilidad
+
+
     - Crear src/utils/availability.ts con funciones para calcular slots disponibles
     - Implementar función que considere horarios del barbero, citas existentes y duración del servicio
     - Validar que slots estén dentro del horario de la barbería
     - Generar slots en intervalos de 15 minutos
     - _Requirements: 6.1, 6.6, 14.1, 14.3, 14.4_
 
-  - [ ] 7.3 Crear hooks para citas
+  - [x] 7.3 Crear hooks para citas
+
+
     - Implementar src/hooks/useAppointments.ts con React Query
     - Crear hook useAvailability para obtener slots disponibles
     - Implementar mutations para crear, actualizar y cancelar citas
     - Agregar invalidación de queries apropiada
     - _Requirements: 6.1, 6.2, 6.3, 7.1_
 
-  - [ ] 7.4 Implementar componentes de calendario y selección de horario
+  - [x] 7.4 Implementar componentes de calendario y selección de horario
+
+
     - Crear CalendarPicker component en src/components/appointment/
     - Implementar TimeSlotPicker component con grid de horarios
     - Crear AppointmentCard component para mostrar citas
     - Agregar estados visuales para disponibilidad
     - _Requirements: 6.1, 6.6_
 
-- [ ] 8. Crear pantallas de cliente
-  - [ ] 8.1 Implementar ClientHomeScreen
+- [x] 8. Crear pantallas de cliente
+
+
+
+
+
+  - [x] 8.1 Implementar ClientHomeScreen
+
+
     - Crear src/screens/client/ClientHomeScreen.tsx
     - Mostrar header con avatar y nombre del usuario
     - Agregar barra de búsqueda
@@ -253,7 +288,9 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Mostrar sección "Próximas Citas" con lista vertical
     - _Requirements: 13.1, 13.5_
 
-  - [ ] 8.2 Implementar SearchScreen
+  - [x] 8.2 Implementar SearchScreen
+
+
     - Crear src/screens/client/SearchScreen.tsx
     - Implementar búsqueda con debounce de 300ms
     - Agregar filtros por nombre y ubicación
@@ -261,7 +298,9 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Implementar ordenamiento por distancia si hay permisos de ubicación
     - _Requirements: 13.1, 13.2, 13.4_
 
-  - [ ] 8.3 Implementar BarbershopDetailScreen
+  - [x] 8.3 Implementar BarbershopDetailScreen
+
+
     - Crear src/screens/client/BarbershopDetailScreen.tsx
     - Mostrar hero image con logo de barbería
     - Implementar tabs: Servicios, Barberos, Reseñas
@@ -269,31 +308,39 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Mostrar horarios de atención y estado (abierta/cerrada)
     - _Requirements: 13.3, 13.5_
 
-  - [ ] 8.4 Implementar BookAppointmentScreen
+  - [x] 8.4 Implementar BookAppointmentScreen
+
+
     - Crear src/screens/client/BookAppointmentScreen.tsx con stepper
     - Implementar paso 1: Selección de servicio
     - Implementar paso 2: Selección de barbero
     - Implementar paso 3: Selección de fecha y hora con CalendarPicker y TimeSlotPicker
     - Implementar paso 4: Confirmación con resumen
-    - Agregar validación en cada paso
+     - Agregar validación en cada paso
     - Mostrar opción de lista de espera si no hay disponibilidad
     - _Requirements: 6.1, 6.2, 6.3, 6.6, 8.1_
 
-  - [ ] 8.5 Implementar ClientAppointmentsScreen
+  - [x] 8.5 Implementar ClientAppointmentsScreen
+
+
     - Crear src/screens/client/ClientAppointmentsScreen.tsx
     - Mostrar lista de citas con tabs: Próximas, Pasadas, Canceladas
     - Implementar AppointmentCard con acciones (ver detalle, cancelar)
     - Agregar pull-to-refresh
     - _Requirements: 11.1, 11.2_
 
-  - [ ] 8.6 Implementar AppointmentDetailScreen para cliente
+  - [x] 8.6 Implementar AppointmentDetailScreen para cliente
+
+
     - Crear src/screens/client/AppointmentDetailScreen.tsx
     - Mostrar detalles completos de la cita
     - Agregar botón para cancelar cita (si está pendiente o confirmada)
     - Mostrar información del barbero y barbería
     - _Requirements: 11.3_
 
-  - [ ] 8.7 Implementar ClientProfileScreen
+  - [x] 8.7 Implementar ClientProfileScreen
+
+
     - Crear src/screens/client/ClientProfileScreen.tsx
     - Mostrar avatar con opción de cambiar foto
     - Implementar formulario para editar nombre, teléfono, email
@@ -303,8 +350,15 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - _Requirements: 9.1, 9.2, 9.3, 9.5, 16.2_
 
 
-- [ ] 9. Crear pantallas de barbero
-  - [ ] 9.1 Implementar BarberScheduleScreen
+- [x] 9. Crear pantallas de barbero
+
+
+
+
+
+
+  - [x] 9.1 Implementar BarberScheduleScreen
+
     - Crear src/screens/barber/BarberScheduleScreen.tsx
     - Mostrar calendario mensual con indicadores de citas
     - Implementar lista de citas del día seleccionado
@@ -312,14 +366,18 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Mostrar acciones rápidas: confirmar, completar, cancelar
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-  - [ ] 9.2 Implementar BarberAppointmentsScreen
+
+  - [x] 9.2 Implementar BarberAppointmentsScreen
+
     - Crear src/screens/barber/BarberAppointmentsScreen.tsx
     - Mostrar lista de todas las citas del barbero
     - Implementar filtros por fecha y estado
     - Agregar búsqueda por nombre de cliente
     - _Requirements: 7.1, 11.5_
 
-  - [ ] 9.3 Implementar AppointmentDetailScreen para barbero
+  - [x] 9.3 Implementar AppointmentDetailScreen para barbero
+
+
     - Crear src/screens/barber/AppointmentDetailScreen.tsx
     - Mostrar detalles completos de la cita
     - Agregar botones para cambiar estado (confirmar, completar, cancelar)
@@ -327,14 +385,18 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Permitir agregar notas a la cita
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 11.3_
 
-  - [ ] 9.4 Implementar BarberHistoryScreen
+  - [x] 9.4 Implementar BarberHistoryScreen
+
+
     - Crear src/screens/barber/BarberHistoryScreen.tsx
     - Mostrar historial de citas completadas
     - Implementar filtros por rango de fechas
     - Mostrar estadísticas básicas (total de citas, ingresos generados)
     - _Requirements: 11.5_
 
-  - [ ] 9.5 Implementar BarberProfileScreen
+
+  - [x] 9.5 Implementar BarberProfileScreen
+
     - Crear src/screens/barber/BarberProfileScreen.tsx
     - Mostrar y permitir editar foto, nombre, teléfono
     - Agregar sección para editar especialidades y bio
@@ -342,8 +404,15 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Implementar toggle de tema y botón de cerrar sesión
     - _Requirements: 9.1, 9.2, 9.4_
 
-- [ ] 10. Crear pantallas de administrador de barbería
-  - [ ] 10.1 Implementar AdminDashboardScreen
+- [-] 10. Crear pantallas de administrador de barbería
+
+
+
+
+
+  - [x] 10.1 Implementar AdminDashboardScreen
+
+
     - Crear src/screens/admin/AdminDashboardScreen.tsx
     - Mostrar cards con métricas: total de citas, ingresos del mes, clientes nuevos, tasa de cancelación
     - Implementar gráfico de tendencias de últimos 6 meses
@@ -351,21 +420,27 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Agregar accesos rápidos a gestión de barberos y servicios
     - _Requirements: 10.1, 10.2, 10.3, 10.5_
 
-  - [ ] 10.2 Implementar AdminAppointmentsScreen
+  - [x] 10.2 Implementar AdminAppointmentsScreen
+
+
     - Crear src/screens/admin/AdminAppointmentsScreen.tsx
     - Mostrar todas las citas de la barbería
     - Implementar filtros por barbero, estado y fecha
     - Permitir modificar estado de cualquier cita
     - _Requirements: 7.5_
 
-  - [ ] 10.3 Implementar BarbersManagementScreen
+  - [x] 10.3 Implementar BarbersManagementScreen
+
+
     - Crear src/screens/admin/BarbersManagementScreen.tsx
     - Mostrar lista de barberos de la barbería
     - Agregar botón para añadir nuevo barbero
     - Implementar acciones: editar, activar/desactivar
     - _Requirements: 5.1, 5.2, 5.5_
 
-  - [ ] 10.4 Implementar AddBarberScreen y EditBarberScreen
+  - [x] 10.4 Implementar AddBarberScreen y EditBarberScreen
+
+
     - Crear src/screens/admin/AddBarberScreen.tsx
     - Crear src/screens/admin/EditBarberScreen.tsx
     - Implementar formulario para nombre, email, teléfono, foto, especialidades
@@ -373,14 +448,17 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Validar que horarios estén dentro de horarios de barbería
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 14.2, 14.3_
 
-  - [ ] 10.5 Implementar ServicesManagementScreen
+  - [x] 10.5 Implementar ServicesManagementScreen
+
+
     - Crear src/screens/admin/ServicesManagementScreen.tsx
     - Mostrar lista de servicios de la barbería
     - Agregar botón para crear nuevo servicio
     - Implementar acciones: editar, activar/desactivar
     - _Requirements: 4.1, 4.5_
 
-  - [ ] 10.6 Implementar AddServiceScreen y EditServiceScreen
+  - [-] 10.6 Implementar AddServiceScreen y EditServiceScreen
+
     - Crear src/screens/admin/AddServiceScreen.tsx
     - Crear src/screens/admin/EditServiceScreen.tsx
     - Implementar formulario para nombre, descripción, duración, precio
@@ -404,8 +482,21 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Mostrar top barberos por ingresos y cantidad de citas
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [ ] 11. Crear pantallas de súper administrador
-  - [ ] 11.1 Implementar SuperAdminDashboardScreen
+- [x] 11. Crear pantallas de súper administrador
+
+
+
+
+
+
+
+  - [x] 11.1 Implementar SuperAdminDashboardScreen
+
+
+
+
+
+
     - Crear src/screens/superadmin/SuperAdminDashboardScreen.tsx
     - Mostrar métricas consolidadas de todas las barberías
     - Implementar tabla con estadísticas por barbería
@@ -413,14 +504,18 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Mostrar alertas de barberías con problemas
     - _Requirements: 2.5, 10.4_
 
-  - [ ] 11.2 Implementar BarbershopsManagementScreen
+  - [x] 11.2 Implementar BarbershopsManagementScreen
+
+
     - Crear src/screens/superadmin/BarbershopsManagementScreen.tsx
     - Mostrar lista de todas las barberías
     - Agregar botón para crear nueva barbería
     - Implementar acciones: ver detalle, editar, activar/desactivar
     - _Requirements: 3.1, 3.5_
 
-  - [ ] 11.3 Implementar AddBarbershopScreen y EditBarbershopScreen
+  - [x] 11.3 Implementar AddBarbershopScreen y EditBarbershopScreen
+
+
     - Crear src/screens/superadmin/AddBarbershopScreen.tsx
     - Crear src/screens/superadmin/EditBarbershopScreen.tsx
     - Implementar formulario completo para barbería
@@ -429,7 +524,9 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Configurar horarios de operación
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [ ] 11.4 Implementar UserManagementScreen
+  - [x] 11.4 Implementar UserManagementScreen
+
+
     - Crear src/screens/superadmin/UserManagementScreen.tsx
     - Mostrar lista de todos los usuarios del sistema
     - Implementar filtros por rol y barbería
@@ -437,7 +534,9 @@ Este plan de implementación desglosa el desarrollo de la aplicación de barber�
     - Agregar búsqueda por nombre o email
     - _Requirements: 2.1, 2.4_
 
-  - [ ] 11.5 Implementar GlobalSettingsScreen
+  - [x] 11.5 Implementar GlobalSettingsScreen
+
+
     - Crear src/screens/superadmin/GlobalSettingsScreen.tsx
     - Configurar parámetros globales del sistema
     - Gestionar políticas de privacidad y términos

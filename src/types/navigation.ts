@@ -42,6 +42,7 @@ export type ClientStackParamList = {
 export type BarberTabParamList = {
   Schedule: undefined;
   Appointments: undefined;
+  Sales: undefined;
   History: undefined;
   Profile: undefined;
 };
@@ -58,6 +59,7 @@ export type AdminTabParamList = {
   Dashboard: undefined;
   Appointments: undefined;
   Barbers: undefined;
+  Requests: undefined;
   Services: undefined;
   Profile: undefined;
 };
@@ -90,4 +92,6 @@ export type SuperAdminStackParamList = {
   BarbershopDetail: { barbershopId: string };
   UserManagement: undefined;
   GlobalSettings: undefined;
+  Barbershops: undefined;
+  Statistics: undefined;
 };

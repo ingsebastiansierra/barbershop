@@ -31,28 +31,53 @@ export const useAuth = () => {
    * Check if user has a specific role
    */
   const hasRole = (role: UserRole): boolean => {
-    return user?.rol === role;
+    const userRole = user?.role || user?.rol;
+    // Handle both English and Spanish role names
+    if (role === 'barber' || role === 'barbero') {
+      return userRole === 'barber' || userRole === 'barbero';
+    }
+    if (role === 'client' || role === 'cliente') {
+      return userRole === 'client' || userRole === 'cliente';
+    }
+    return userRole === role;
   };
 
   /**
    * Check if user has any of the specified roles
    */
   const hasAnyRole = (roles: UserRole[]): boolean => {
-    return user ? roles.includes(user.rol) : false;
+    if (!user) return false;
+    const userRole = user.role || user.rol;
+    return roles.some(role => {
+      if (role === 'barber' || role === 'barbero') {
+        return userRole === 'barber' || userRole === 'barbero';
+      }
+      if (role === 'client' || role === 'cliente') {
+        return userRole === 'client' || userRole === 'cliente';
+      }
+      return userRole === role;
+    });
   };
 
   /**
    * Check if user is a barber
    */
   const isBarber = (): boolean => {
-    return hasRole('barbero');
+    return hasRole('barber');
   };
 
   /**
    * Check if user is a client
    */
   const isClient = (): boolean => {
-    return hasRole('cliente');
+    return hasRole('client');
+  };
+
+  /**
+   * Check if user is an admin
+   */
+  const isAdmin = (): boolean => {
+    return hasRole('admin');
   };
 
   /**
@@ -63,18 +88,11 @@ export const useAuth = () => {
   };
 
   /**
-   * Check if user is associated with a barbershop (has negocio_id)
-   */
-  const hasNegocio = (): boolean => {
-    return !!user?.negocio_id;
-  };
-
-  /**
    * Get user's full name or email as fallback
    */
   const getUserDisplayName = (): string => {
     if (!user) return 'Invitado';
-    return user.nombre || user.email;
+    return user.full_name || user.nombre || user.email;
   };
 
   /**
@@ -83,7 +101,7 @@ export const useAuth = () => {
   const getUserInitials = (): string => {
     if (!user) return '?';
 
-    const name = user.nombre || user.email;
+    const name = user.full_name || user.nombre || user.email;
     const parts = name.split(' ');
 
     if (parts.length >= 2) {
@@ -99,13 +117,20 @@ export const useAuth = () => {
   const getRoleDisplayName = (): string => {
     if (!user) return '';
 
-    switch (user.rol) {
+    const role = user.role || user.rol;
+    switch (role) {
+      case 'barber':
       case 'barbero':
         return 'Barbero';
+      case 'client':
       case 'cliente':
         return 'Cliente';
+      case 'admin':
+        return 'Administrador';
+      case 'super_admin':
+        return 'Super Administrador';
       default:
-        return user.rol;
+        return role || '';
     }
   };
 
@@ -129,10 +154,10 @@ export const useAuth = () => {
     hasAnyRole,
     isBarber,
     isClient,
+    isAdmin,
 
     // Permission checks
     canManageAppointments,
-    hasNegocio,
 
     // Utilities
     getUserDisplayName,

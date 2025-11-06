@@ -1,15 +1,18 @@
 /**
  * GlobalSettingsScreen
- * Screen for super admin profile and settings
+ * Screen for super admin profile and global system settings
+ * Requirements: 18.1, 20.3
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  TextInput,
+  Switch,
   Alert,
 } from 'react-native';
 import { useThemeStore } from '../../store/themeStore';
@@ -17,8 +20,13 @@ import { useAuth } from '../../hooks/useAuth';
 import { showToast } from '../../utils/toast';
 
 export const GlobalSettingsScreen: React.FC = () => {
-  const { colors } = useThemeStore();
+  const { colors, theme, toggleTheme } = useThemeStore();
   const { user, logout, getUserDisplayName, getUserInitials } = useAuth();
+
+  // Global system settings (these would normally be stored in a database)
+  const [defaultTaxRate, setDefaultTaxRate] = useState('16');
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [allowNewRegistrations, setAllowNewRegistrations] = useState(true);
 
   const handleLogout = () => {
     Alert.alert(
@@ -43,6 +51,27 @@ export const GlobalSettingsScreen: React.FC = () => {
           },
         },
       ]
+    );
+  };
+
+  const handleSaveSettings = () => {
+    // In a real implementation, this would save to the database
+    showToast.success('Configuración guardada', '✅ Éxito');
+  };
+
+  const handleViewPrivacyPolicy = () => {
+    Alert.alert(
+      'Política de Privacidad',
+      'Esta funcionalidad abrirá la política de privacidad del sistema.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleViewTerms = () => {
+    Alert.alert(
+      'Términos y Condiciones',
+      'Esta funcionalidad abrirá los términos y condiciones del sistema.',
+      [{ text: 'OK' }]
     );
   };
 
@@ -123,10 +152,145 @@ export const GlobalSettingsScreen: React.FC = () => {
         </View>
       </View>
 
+      {/* Configuración Global del Sistema */}
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          ⚙️ Configuración Global del Sistema
+        </Text>
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingInfo}>
+            <Text style={[styles.settingLabel, { color: colors.textPrimary }]}>
+              Tasa de Impuesto por Defecto (%)
+            </Text>
+            <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+              Impuesto aplicado a los servicios
+            </Text>
+          </View>
+          <TextInput
+            style={[
+              styles.taxInput,
+              {
+                backgroundColor: colors.background,
+                color: colors.textPrimary,
+                borderColor: colors.border,
+              },
+            ]}
+            value={defaultTaxRate}
+            onChangeText={setDefaultTaxRate}
+            keyboardType="decimal-pad"
+            placeholder="16"
+            placeholderTextColor={colors.textSecondary + '80'}
+          />
+        </View>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingInfo}>
+            <Text style={[styles.settingLabel, { color: colors.textPrimary }]}>
+              Modo Mantenimiento
+            </Text>
+            <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+              Bloquea el acceso al sistema
+            </Text>
+          </View>
+          <Switch
+            value={maintenanceMode}
+            onValueChange={setMaintenanceMode}
+            trackColor={{ false: colors.border, true: colors.primary + '80' }}
+            thumbColor={maintenanceMode ? colors.primary : colors.surface}
+          />
+        </View>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingInfo}>
+            <Text style={[styles.settingLabel, { color: colors.textPrimary }]}>
+              Permitir Nuevos Registros
+            </Text>
+            <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+              Habilita el registro de nuevos usuarios
+            </Text>
+          </View>
+          <Switch
+            value={allowNewRegistrations}
+            onValueChange={setAllowNewRegistrations}
+            trackColor={{ false: colors.border, true: colors.primary + '80' }}
+            thumbColor={allowNewRegistrations ? colors.primary : colors.surface}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={[styles.saveButton, { backgroundColor: colors.primary }]}
+          onPress={handleSaveSettings}
+        >
+          <Text style={styles.saveButtonText}>💾 Guardar Configuración</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Políticas y Términos */}
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          📄 Políticas y Términos
+        </Text>
+
+        <TouchableOpacity
+          style={styles.policyButton}
+          onPress={handleViewPrivacyPolicy}
+        >
+          <Text style={[styles.policyButtonText, { color: colors.textPrimary }]}>
+            Ver Política de Privacidad
+          </Text>
+          <Text style={[styles.policyButtonIcon, { color: colors.textSecondary }]}>
+            →
+          </Text>
+        </TouchableOpacity>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <TouchableOpacity
+          style={styles.policyButton}
+          onPress={handleViewTerms}
+        >
+          <Text style={[styles.policyButtonText, { color: colors.textPrimary }]}>
+            Ver Términos y Condiciones
+          </Text>
+          <Text style={[styles.policyButtonIcon, { color: colors.textSecondary }]}>
+            →
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Preferencias de Aplicación */}
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          🎨 Preferencias de Aplicación
+        </Text>
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingInfo}>
+            <Text style={[styles.settingLabel, { color: colors.textPrimary }]}>
+              Tema Oscuro
+            </Text>
+            <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+              Cambiar entre tema claro y oscuro
+            </Text>
+          </View>
+          <Switch
+            value={theme === 'dark'}
+            onValueChange={toggleTheme}
+            trackColor={{ false: colors.border, true: colors.primary + '80' }}
+            thumbColor={theme === 'dark' ? colors.primary : colors.surface}
+          />
+        </View>
+      </View>
+
       {/* Permisos */}
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-          Permisos de Super Admin
+          🔐 Permisos de Super Admin
         </Text>
 
         <View style={styles.permissionRow}>
@@ -242,6 +406,58 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  settingInfo: {
+    flex: 1,
+    marginRight: 16,
+  },
+  settingLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  settingDescription: {
+    fontSize: 12,
+  },
+  taxInput: {
+    width: 70,
+    height: 40,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    textAlign: 'center',
+    borderWidth: 1,
+  },
+  saveButton: {
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  saveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  policyButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  policyButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  policyButtonIcon: {
+    fontSize: 18,
   },
   permissionRow: {
     flexDirection: 'row',

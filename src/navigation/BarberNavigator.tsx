@@ -4,15 +4,18 @@
  */
 
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BarberTabParamList, BarberStackParamList } from '../types/navigation';
 import { useThemeStore } from '../store/themeStore';
+import { useBarberStatus } from '../hooks/useBarberStatus';
 import { Ionicons } from '@expo/vector-icons';
 
 // Tab Screens
 import { BarberScheduleScreen } from '../screens/barber/BarberScheduleScreen';
 import { BarberAppointmentsScreen } from '../screens/barber/BarberAppointmentsScreen';
+import { BarberSalesScreen } from '../screens/barber/BarberSalesScreen';
 import { BarberHistoryScreen } from '../screens/barber/BarberHistoryScreen';
 import { BarberProfileScreen } from '../screens/barber/BarberProfileScreen';
 
@@ -20,6 +23,7 @@ import { BarberProfileScreen } from '../screens/barber/BarberProfileScreen';
 import { BarberAppointmentDetailScreen } from '../screens/barber/BarberAppointmentDetailScreen';
 import { ClientProfileScreen } from '../screens/barber/ClientProfileScreen';
 import { BarberNotificationsScreen } from '../screens/barber/BarberNotificationsScreen';
+import { BarberPendingScreen } from '../screens/barber/BarberPendingScreen';
 
 const Tab = createBottomTabNavigator<BarberTabParamList>();
 const Stack = createNativeStackNavigator<BarberStackParamList>();
@@ -67,6 +71,16 @@ const BarberTabs: React.FC = () => {
         }}
       />
       <Tab.Screen
+        name="Sales"
+        component={BarberSalesScreen}
+        options={{
+          title: 'Ventas',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cash-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="History"
         component={BarberHistoryScreen}
         options={{
@@ -95,7 +109,29 @@ const BarberTabs: React.FC = () => {
  */
 export const BarberNavigator: React.FC = () => {
   const { colors } = useThemeStore();
+  const { data: barberStatus, isLoading } = useBarberStatus();
 
+  // Show loading while checking barber status
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  // If barber is not approved, show pending screen
+  if (barberStatus && barberStatus.approval_status !== 'approved') {
+    return (
+      <BarberPendingScreen
+        approvalStatus={barberStatus.approval_status}
+        rejectionReason={barberStatus.rejection_reason}
+        barbershopName={barberStatus.barbershop_name}
+      />
+    );
+  }
+
+  // If approved, show normal navigation
   return (
     <Stack.Navigator
       screenOptions={{

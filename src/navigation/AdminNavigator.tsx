@@ -19,6 +19,7 @@ import { AdminProfileScreen } from '../screens/admin/AdminProfileScreen';
 
 // Stack Screens
 import { BarbershopSettingsScreen } from '../screens/admin/BarbershopSettingsScreen';
+import { BarberRequestsScreen } from '../screens/admin/BarberRequestsScreen';
 import { AddBarberScreen } from '../screens/admin/AddBarberScreen';
 import { EditBarberScreen } from '../screens/admin/EditBarberScreen';
 import { AddServiceScreen } from '../screens/admin/AddServiceScreen';
@@ -78,6 +79,16 @@ const AdminTabs: React.FC = () => {
           title: 'Barberos',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Requests"
+        component={BarberRequestsScreen}
+        options={{
+          title: 'Solicitudes',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="mail" size={size} color={color} />
           ),
         }}
       />

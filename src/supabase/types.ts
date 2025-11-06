@@ -11,27 +11,27 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      usuarios: {
+      users: {
         Row: Usuario;
         Insert: Omit<Usuario, 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Usuario, 'id' | 'created_at'>>;
       };
-      negocios: {
+      barbershops: {
         Row: Negocio;
         Insert: Omit<Negocio, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Negocio, 'id' | 'created_at'>>;
       };
-      servicios: {
+      services: {
         Row: Servicio;
         Insert: Omit<Servicio, 'id' | 'created_at'>;
         Update: Partial<Omit<Servicio, 'id' | 'created_at'>>;
       };
-      citas: {
+      appointments: {
         Row: Cita;
         Insert: Omit<Cita, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Cita, 'id' | 'created_at'>>;
       };
-      fila: {
+      waitlist: {
         Row: FilaEntry;
         Insert: Omit<FilaEntry, 'id' | 'created_at'>;
         Update: Partial<Omit<FilaEntry, 'id' | 'created_at'>>;
@@ -45,10 +45,10 @@ export interface Database {
     Views: {};
     Functions: {};
     Enums: {
-      user_role: 'barbero' | 'cliente' | 'admin' | 'super_admin';
-      cita_estado: 'pendiente' | 'confirmada' | 'en_proceso' | 'completada' | 'cancelada';
-      fila_estado: 'esperando' | 'atendiendo' | 'completado' | 'cancelado';
-      metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia';
+      user_role: 'super_admin' | 'admin' | 'barber' | 'client';
+      appointment_status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+      waitlist_status: 'waiting' | 'notified' | 'confirmed' | 'expired';
+      payment_method: 'cash' | 'card' | 'transfer';
     };
   };
 }
@@ -58,18 +58,18 @@ export type UserRole = Database['public']['Enums']['user_role'];
 
 export interface Usuario {
   id: string;
-  nombre: string;
   email: string;
-  telefono: string;
-  rol: UserRole;
-  negocio_id: string | null;
-  avatar: string | null;
-  especialidad: string | null;
-  horario_inicio: string | null;
-  horario_fin: string | null;
-  activo: boolean;
+  role: UserRole;
+  full_name: string;
+  phone: string | null;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
+  // Legacy field mappings for compatibility
+  nombre?: string;
+  telefono?: string;
+  rol?: UserRole;
+  avatar?: string | null;
 }
 
 // Negocio types

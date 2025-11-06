@@ -27,6 +27,8 @@ interface ButtonProps {
   disabled?: boolean;
   icon?: React.ReactNode;
   fullWidth?: boolean;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -38,6 +40,8 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   icon,
   fullWidth = false,
+  style,
+  textStyle,
 }) => {
   const { colors } = useThemeStore();
 
@@ -128,7 +132,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity
-      style={getButtonStyle()}
+      style={[getButtonStyle(), style]}
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}
@@ -141,7 +145,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <>
           {icon && <>{icon}</>}
-          <Text style={getTextStyle()}>{title}</Text>
+          <Text style={[getTextStyle(), textStyle]}>{title}</Text>
         </>
       )}
     </TouchableOpacity>

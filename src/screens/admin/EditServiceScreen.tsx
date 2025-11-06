@@ -1,9 +1,9 @@
 /**
  * EditServiceScreen
- * Screen for editing a service
+ * Screen for editing an existing service
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AdminStackParamList } from '../../types/navigation';
