@@ -11,6 +11,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ClientStackParamList } from '../../types/navigation';
@@ -23,18 +24,22 @@ import { useAvailability } from '../../hooks/useAvailability';
 import { useCreateAppointment } from '../../hooks/useAppointments';
 import { CalendarPicker } from '../../components/appointment/CalendarPicker';
 import { TimeSlotPicker } from '../../components/appointment/TimeSlotPicker';
+import { HaircutStyleSelector } from '../../components/appointment/HaircutStyleSelector';
 import { Button } from '../../components/common/Button';
 import { ConfirmationModal } from '../../components/common/ConfirmationModal';
-import { Service, BarberWithUser } from '../../types/models';
+import { Service, BarberWithUser, HaircutStyle } from '../../types/models';
 import { showToast } from '../../utils/toast';
+import { haircutStyleService } from '../../services/haircutStyle.service';
+import { useAuth } from '../../hooks/useAuth';
 
 type Props = NativeStackScreenProps<ClientStackParamList, 'BookAppointment'>;
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3 | 4 | 5;
 
 export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const { barbershopId, barberId: initialBarberId } = route.params;
   const { colors } = useThemeStore();
+  const { user } = useAuth();
 
   // State
   const [currentStep, setCurrentStep] = useState<Step>(1);
@@ -42,6 +47,7 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
   const [selectedBarber, setSelectedBarber] = useState<BarberWithUser | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedHaircutStyle, setSelectedHaircutStyle] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   // Fetch data
@@ -55,6 +61,18 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
     queryFn: () => barberService.getActiveBarbersByBarbershop(barbershopId),
   });
 
+  // Fetch haircut styles based on user gender
+  const { data: haircutStyles = [], isLoading: loadingStyles } = useQuery({
+    queryKey: ['haircutStyles', user?.gender],
+    queryFn: () => {
+      if (user?.gender) {
+        return haircutStyleService.getStylesByGender(user.gender);
+      }
+      return haircutStyleService.getAllStyles();
+    },
+    enabled: currentStep === 2, // Only load when on haircut style step
+  });
+
   // Fetch availability
   const {
     data: availableSlots = [],
@@ -63,7 +81,7 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
     selectedBarber?.id || '',
     selectedDate.toISOString().split('T')[0],
     selectedService?.id || '',
-    currentStep === 3 && !!selectedBarber && !!selectedService
+    currentStep === 4 && !!selectedBarber && !!selectedService
   );
 
   // Create appointment mutation
@@ -84,16 +102,17 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
       showToast.error('Por favor selecciona un servicio');
       return;
     }
-    if (currentStep === 2 && !selectedBarber) {
+    // Step 2 is haircut style selection (optional)
+    if (currentStep === 3 && !selectedBarber) {
       showToast.error('Por favor selecciona un barbero');
       return;
     }
-    if (currentStep === 3 && !selectedTime) {
+    if (currentStep === 4 && !selectedTime) {
       showToast.error('Por favor selecciona un horario');
       return;
     }
 
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       setCurrentStep((prev) => (prev + 1) as Step);
     }
   };
@@ -124,6 +143,7 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
         service_id: selectedService.id,
         appointment_date: selectedDate.toISOString().split('T')[0],
         start_time: selectedTime,
+        haircut_style_id: selectedHaircutStyle || undefined,
       });
 
       setShowConfirmModal(false);
@@ -142,7 +162,7 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
 
   const renderStepIndicator = () => (
     <View style={styles.stepIndicator}>
-      {[1, 2, 3, 4].map((step) => (
+      {[1, 2, 3, 4, 5].map((step) => (
         <View key={step} style={styles.stepItem}>
           <View
             style={[
@@ -238,6 +258,17 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
 
   const renderStep2 = () => (
     <View style={styles.stepContent}>
+      <HaircutStyleSelector
+        styles={haircutStyles}
+        selectedStyleId={selectedHaircutStyle || undefined}
+        onSelectStyle={(style) => setSelectedHaircutStyle(style.id)}
+        loading={loadingStyles}
+      />
+    </View>
+  );
+
+  const renderStep3 = () => (
+    <View style={styles.stepContent}>
       <Text style={[styles.stepTitle, { color: colors.textPrimary }]}>
         Selecciona un barbero
       </Text>
@@ -295,7 +326,7 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
     </View>
   );
 
-  const renderStep3 = () => (
+  const renderStep4 = () => (
     <View style={styles.stepContent}>
       <Text style={[styles.stepTitle, { color: colors.textPrimary }]}>
         Selecciona fecha y hora
@@ -339,43 +370,71 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
     </View>
   );
 
-  const renderStep4 = () => (
-    <View style={styles.stepContent}>
-      <Text style={[styles.stepTitle, { color: colors.textPrimary }]}>
-        Confirmar reserva
-      </Text>
-
-      <View style={[styles.summaryCard, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.summaryTitle, { color: colors.textPrimary }]}>
-          Resumen de la cita
+  const renderStep5 = () => {
+    const selectedStyle = haircutStyles.find(s => s.id === selectedHaircutStyle);
+    
+    return (
+      <View style={styles.stepContent}>
+        <Text style={[styles.stepTitle, { color: colors.textPrimary }]}>
+          Confirmar reserva
         </Text>
 
-        <View style={styles.summaryRow}>
-          <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
-            Barbería:
+        <View style={[styles.summaryCard, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.summaryTitle, { color: colors.textPrimary }]}>
+            Resumen de la cita
           </Text>
-          <Text style={[styles.summaryValue, { color: colors.textPrimary }]}>
-            {barbershop?.name}
-          </Text>
-        </View>
 
-        <View style={styles.summaryRow}>
-          <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
-            Servicio:
-          </Text>
-          <Text style={[styles.summaryValue, { color: colors.textPrimary }]}>
-            {selectedService?.name}
-          </Text>
-        </View>
+          <View style={styles.summaryRow}>
+            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+              Barbería:
+            </Text>
+            <Text style={[styles.summaryValue, { color: colors.textPrimary }]}>
+              {barbershop?.name}
+            </Text>
+          </View>
 
-        <View style={styles.summaryRow}>
-          <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
-            Barbero:
-          </Text>
-          <Text style={[styles.summaryValue, { color: colors.textPrimary }]}>
-            {selectedBarber?.user.full_name}
-          </Text>
-        </View>
+          <View style={styles.summaryRow}>
+            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+              Servicio:
+            </Text>
+            <Text style={[styles.summaryValue, { color: colors.textPrimary }]}>
+              {selectedService?.name}
+            </Text>
+          </View>
+
+          {selectedStyle && (
+            <View style={styles.haircutStyleSection}>
+              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+                Estilo de corte:
+              </Text>
+              <View style={styles.haircutStyleContent}>
+                <Image
+                  source={{ uri: selectedStyle.image_url }}
+                  style={styles.haircutStyleImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.haircutStyleInfo}>
+                  <Text style={[styles.haircutStyleName, { color: colors.textPrimary }]}>
+                    {selectedStyle.name}
+                  </Text>
+                  {selectedStyle.description && (
+                    <Text style={[styles.haircutStyleDescription, { color: colors.textSecondary }]}>
+                      {selectedStyle.description}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          )}
+
+          <View style={styles.summaryRow}>
+            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+              Barbero:
+            </Text>
+            <Text style={[styles.summaryValue, { color: colors.textPrimary }]}>
+              {selectedBarber?.user.full_name}
+            </Text>
+          </View>
 
         <View style={styles.summaryRow}>
           <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
@@ -419,9 +478,10 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
             ${selectedService?.price.toFixed(2)}
           </Text>
         </View>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -432,6 +492,7 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
         {currentStep === 4 && renderStep4()}
+        {currentStep === 5 && renderStep5()}
       </ScrollView>
 
       {/* Navigation buttons */}
@@ -445,7 +506,7 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
             style={styles.backButton}
           />
         )}
-        {currentStep < 4 ? (
+        {currentStep < 5 ? (
           <Button
             title="Siguiente"
             onPress={handleNext}
@@ -650,6 +711,32 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 24,
     fontWeight: '700',
+  },
+  haircutStyleSection: {
+    marginBottom: 12,
+  },
+  haircutStyleContent: {
+    flexDirection: 'row',
+    marginTop: 8,
+    gap: 12,
+  },
+  haircutStyleImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  haircutStyleInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  haircutStyleName: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  haircutStyleDescription: {
+    fontSize: 12,
+    lineHeight: 16,
   },
   navigationButtons: {
     flexDirection: 'row',

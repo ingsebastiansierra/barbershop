@@ -131,6 +131,11 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
           <Text style={[styles.serviceName, { color: colors.textSecondary }]}>
             {appointment.service?.name}
           </Text>
+          {appointment.haircut_style && (
+            <Text style={[styles.haircutStyleBadge, { color: colors.primary }]}>
+              💇 {appointment.haircut_style.name}
+            </Text>
+          )}
         </View>
       </View>
 
@@ -278,6 +283,11 @@ const styles = StyleSheet.create({
   },
   serviceName: {
     fontSize: 14,
+  },
+  haircutStyleBadge: {
+    fontSize: 12,
+    marginTop: 4,
+    fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',

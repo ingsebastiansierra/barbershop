@@ -47,6 +47,13 @@ export enum NotificationType {
   SYSTEM = 'system',
 }
 
+export enum UserGender {
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
+  PREFER_NOT_TO_SAY = 'prefer_not_to_say',
+}
+
 // =====================================================
 // BASE TYPES
 // =====================================================
@@ -103,6 +110,7 @@ export interface User {
   full_name: string;
   phone?: string;
   avatar_url?: string;
+  gender?: UserGender;
   created_at: string;
   updated_at: string;
 }
@@ -168,6 +176,17 @@ export interface Service {
   updated_at: string;
 }
 
+export interface HaircutStyle {
+  id: string;
+  name: string;
+  description?: string;
+  gender: UserGender;
+  image_url: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Appointment {
   id: string;
   barbershop_id: string;
@@ -182,6 +201,7 @@ export interface Appointment {
   payment_method?: PaymentMethod;
   total_price: number;
   notes?: string;
+  haircut_style_id?: string;
   cancellation_reason?: string;
   cancelled_at?: string;
   created_at: string;
@@ -193,6 +213,7 @@ export interface AppointmentWithDetails extends Appointment {
   client: User;
   service: Service;
   barbershop: Barbershop;
+  haircut_style?: HaircutStyle;
 }
 
 export interface WaitlistEntry {

@@ -29,6 +29,7 @@ export const ClientProfileScreen: React.FC = () => {
   const [editName, setEditName] = useState(user?.full_name || '');
   const [editPhone, setEditPhone] = useState(user?.phone || '');
   const [editEmail, setEditEmail] = useState(user?.email || '');
+  const [editGender, setEditGender] = useState(user?.gender || 'prefer_not_to_say');
 
   // Change password modal state
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
@@ -66,6 +67,7 @@ export const ClientProfileScreen: React.FC = () => {
     setEditName(user?.full_name || '');
     setEditPhone(user?.phone || '');
     setEditEmail(user?.email || '');
+    setEditGender(user?.gender || 'prefer_not_to_say');
     setEditModalVisible(true);
   };
 
@@ -82,6 +84,7 @@ export const ClientProfileScreen: React.FC = () => {
         full_name: editName.trim(),
         phone: editPhone.trim() || undefined,
         email: editEmail.trim(),
+        gender: editGender as any,
       });
 
       showToast.success('Perfil actualizado correctamente');
@@ -198,6 +201,20 @@ export const ClientProfileScreen: React.FC = () => {
             {user?.phone || 'No especificado'}
           </Text>
         </View>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <View style={styles.infoRow}>
+          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
+            Género
+          </Text>
+          <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
+            {user?.gender === 'male' ? '👨 Masculino' : 
+             user?.gender === 'female' ? '👩 Femenino' : 
+             user?.gender === 'other' ? '🧑 Otro' : 
+             '🤷 Prefiero no decir'}
+          </Text>
+        </View>
       </View>
 
       {/* Configuración */}
@@ -281,6 +298,85 @@ export const ClientProfileScreen: React.FC = () => {
               placeholder="(opcional)"
               keyboardType="phone-pad"
             />
+
+            <View style={styles.genderSection}>
+              <Text style={[styles.genderLabel, { color: colors.textPrimary }]}>
+                Género
+              </Text>
+              <View style={styles.genderOptions}>
+                <TouchableOpacity
+                  style={[
+                    styles.genderOption,
+                    { 
+                      backgroundColor: editGender === 'male' ? colors.primary : colors.background,
+                      borderColor: editGender === 'male' ? colors.primary : colors.border,
+                    }
+                  ]}
+                  onPress={() => setEditGender('male')}
+                >
+                  <Text style={[
+                    styles.genderOptionText,
+                    { color: editGender === 'male' ? '#FFFFFF' : colors.textPrimary }
+                  ]}>
+                    👨 Masculino
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.genderOption,
+                    { 
+                      backgroundColor: editGender === 'female' ? colors.primary : colors.background,
+                      borderColor: editGender === 'female' ? colors.primary : colors.border,
+                    }
+                  ]}
+                  onPress={() => setEditGender('female')}
+                >
+                  <Text style={[
+                    styles.genderOptionText,
+                    { color: editGender === 'female' ? '#FFFFFF' : colors.textPrimary }
+                  ]}>
+                    👩 Femenino
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.genderOption,
+                    { 
+                      backgroundColor: editGender === 'other' ? colors.primary : colors.background,
+                      borderColor: editGender === 'other' ? colors.primary : colors.border,
+                    }
+                  ]}
+                  onPress={() => setEditGender('other')}
+                >
+                  <Text style={[
+                    styles.genderOptionText,
+                    { color: editGender === 'other' ? '#FFFFFF' : colors.textPrimary }
+                  ]}>
+                    🧑 Otro
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.genderOption,
+                    { 
+                      backgroundColor: editGender === 'prefer_not_to_say' ? colors.primary : colors.background,
+                      borderColor: editGender === 'prefer_not_to_say' ? colors.primary : colors.border,
+                    }
+                  ]}
+                  onPress={() => setEditGender('prefer_not_to_say')}
+                >
+                  <Text style={[
+                    styles.genderOptionText,
+                    { color: editGender === 'prefer_not_to_say' ? '#FFFFFF' : colors.textPrimary }
+                  ]}>
+                    🤷 Prefiero no decir
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
             <View style={styles.modalButtons}>
               <Button
@@ -486,5 +582,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 8,
+  },
+  genderSection: {
+    marginBottom: 16,
+  },
+  genderLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  genderOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  genderOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1.5,
+  },
+  genderOptionText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

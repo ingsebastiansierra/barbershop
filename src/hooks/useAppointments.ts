@@ -37,13 +37,13 @@ export function useAppointments(filters?: AppointmentFilters) {
   return useQuery({
     queryKey: appointmentKeys.list(
       user?.id || '',
-      user?.rol as UserRole || UserRole.CLIENT,
+      (user?.role || user?.rol) as UserRole || UserRole.CLIENT,
       filters
     ),
     queryFn: () =>
       appointmentService.getAppointments(
         user?.id || '',
-        user?.rol as UserRole || UserRole.CLIENT,
+        (user?.role || user?.rol) as UserRole || UserRole.CLIENT,
         filters
       ),
     enabled: !!user,
@@ -70,12 +70,12 @@ export function useTodayAppointments() {
   return useQuery({
     queryKey: appointmentKeys.today(
       user?.id || '',
-      user?.rol as UserRole || UserRole.CLIENT
+      (user?.role || user?.rol) as UserRole || UserRole.CLIENT
     ),
     queryFn: () =>
       appointmentService.getTodayAppointments(
         user?.id || '',
-        user?.rol as UserRole || UserRole.CLIENT
+        (user?.role || user?.rol) as UserRole || UserRole.CLIENT
       ),
     enabled: !!user,
     refetchInterval: 60000, // Refetch every minute
@@ -91,12 +91,12 @@ export function useUpcomingAppointments() {
   return useQuery({
     queryKey: appointmentKeys.upcoming(
       user?.id || '',
-      user?.rol as UserRole || UserRole.CLIENT
+      (user?.role || user?.rol) as UserRole || UserRole.CLIENT
     ),
     queryFn: () =>
       appointmentService.getUpcomingAppointments(
         user?.id || '',
-        user?.rol as UserRole || UserRole.CLIENT
+        (user?.role || user?.rol) as UserRole || UserRole.CLIENT
       ),
     enabled: !!user,
   });
@@ -111,12 +111,12 @@ export function useAppointmentHistory() {
   return useQuery({
     queryKey: appointmentKeys.history(
       user?.id || '',
-      user?.rol as UserRole || UserRole.CLIENT
+      (user?.role || user?.rol) as UserRole || UserRole.CLIENT
     ),
     queryFn: () =>
       appointmentService.getAppointmentHistory(
         user?.id || '',
-        user?.rol as UserRole || UserRole.CLIENT
+        (user?.role || user?.rol) as UserRole || UserRole.CLIENT
       ),
     enabled: !!user,
   });

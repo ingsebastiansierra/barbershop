@@ -27,6 +27,8 @@ class AppointmentService {
     filters?: AppointmentFilters
   ): Promise<AppointmentWithDetails[]> {
     try {
+      console.log('🔍 getAppointments called with:', { userId, role, filters });
+      
       let query = supabase
         .from('appointments')
         .select(`
@@ -37,15 +39,18 @@ class AppointmentService {
           ),
           client:users!appointments_client_id_fkey(*),
           service:services!appointments_service_id_fkey(*),
-          barbershop:barbershops!appointments_barbershop_id_fkey(*)
+          barbershop:barbershops!appointments_barbershop_id_fkey(*),
+          haircut_style:haircut_styles(*)
         `);
 
       // Apply role-based filtering
       switch (role) {
         case UserRole.CLIENT:
+          console.log('📋 Filtering by client_id:', userId);
           query = query.eq('client_id', userId);
           break;
         case UserRole.BARBER:
+          console.log('💈 Filtering by barber_id:', userId);
           query = query.eq('barber_id', userId);
           break;
         case UserRole.ADMIN:
@@ -95,9 +100,11 @@ class AppointmentService {
       const { data, error } = await query;
 
       if (error) {
+        console.error('❌ Error fetching appointments:', error);
         throw new Error(`Error fetching appointments: ${error.message}`);
       }
 
+      console.log('✅ Appointments fetched:', data?.length || 0, 'appointments');
       return (data || []) as AppointmentWithDetails[];
     } catch (error) {
       console.error('getAppointments error:', error);
@@ -120,7 +127,8 @@ class AppointmentService {
           ),
           client:users!appointments_client_id_fkey(*),
           service:services!appointments_service_id_fkey(*),
-          barbershop:barbershops!appointments_barbershop_id_fkey(*)
+          barbershop:barbershops!appointments_barbershop_id_fkey(*),
+          haircut_style:haircut_styles(*)
         `)
         .eq('id', id)
         .single();

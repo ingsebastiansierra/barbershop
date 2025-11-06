@@ -269,6 +269,32 @@ export const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) 
         </View>
       </View>
 
+      {/* Haircut Style Info */}
+      {appointment.haircut_style && (
+        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
+            💇 Estilo de Corte
+          </Text>
+          <View style={styles.haircutStyleContainer}>
+            <Image
+              source={{ uri: appointment.haircut_style.image_url }}
+              style={styles.haircutStyleImage}
+              resizeMode="cover"
+            />
+            <View style={styles.haircutStyleInfo}>
+              <Text style={[styles.haircutStyleName, { color: colors.textPrimary }]}>
+                {appointment.haircut_style.name}
+              </Text>
+              {appointment.haircut_style.description && (
+                <Text style={[styles.haircutStyleDescription, { color: colors.textSecondary }]}>
+                  {appointment.haircut_style.description}
+                </Text>
+              )}
+            </View>
+          </View>
+        </View>
+      )}
+
       {/* Barbershop Info */}
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
@@ -521,5 +547,27 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     marginTop: 8,
+  },
+  haircutStyleContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  haircutStyleImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
+  haircutStyleInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  haircutStyleName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  haircutStyleDescription: {
+    fontSize: 13,
+    lineHeight: 18,
   },
 });
