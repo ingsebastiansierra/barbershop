@@ -217,10 +217,10 @@ export const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) 
             {appointment.barber?.rating !== undefined && (
               <View style={styles.barberRating}>
                 <Text style={[styles.ratingText, { color: colors.warning }]}>
-                  ⭐ {appointment.barber.rating.toFixed(1)}
+                  ⭐ {(appointment.barber.rating || 0).toFixed(1)}
                 </Text>
                 <Text style={[styles.reviewsText, { color: colors.textSecondary }]}>
-                  ({appointment.barber.total_reviews} reseñas)
+                  ({appointment.barber.total_reviews || 0} reseñas)
                 </Text>
               </View>
             )}

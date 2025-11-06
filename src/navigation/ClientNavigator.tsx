@@ -9,6 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ClientTabParamList, ClientStackParamList } from '../types/navigation';
 import { useThemeStore } from '../store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedTabBar } from '../components/common';
 
 // Tab Screens
 import { ClientHomeScreen } from '../screens/client/ClientHomeScreen';
@@ -35,13 +36,10 @@ const ClientTabs: React.FC = () => {
 
   return (
     <Tab.Navigator
+      tabBar={(props) => <AnimatedTabBar {...props} />}
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-        },
         headerStyle: {
           backgroundColor: colors.background,
         },

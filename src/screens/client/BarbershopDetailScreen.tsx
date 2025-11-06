@@ -110,10 +110,10 @@ export const BarbershopDetailScreen: React.FC<Props> = ({ route, navigation }) =
         )}
         <View style={styles.barberRating}>
           <Text style={[styles.ratingText, { color: colors.warning }]}>
-            ⭐ {item.rating.toFixed(1)}
+            ⭐ {(item.rating || 0).toFixed(1)}
           </Text>
           <Text style={[styles.reviewsText, { color: colors.textSecondary }]}>
-            ({item.total_reviews} reseñas)
+            ({item.total_reviews || 0} reseñas)
           </Text>
         </View>
       </View>

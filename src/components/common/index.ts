@@ -8,3 +8,4 @@ export { Card } from './Card';
 export { Avatar } from './Avatar';
 export { Modal } from './Modal';
 export { TimePicker } from './TimePicker';
+export { AnimatedTabBar } from './AnimatedTabBar';

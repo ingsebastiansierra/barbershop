@@ -12,11 +12,15 @@ import {
   Alert,
   Switch,
   ActivityIndicator,
+  Platform,
+  Linking,
 } from 'react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import * as Location from 'expo-location';
 import { useThemeStore } from '../../store/themeStore';
 import { useAdminBarbershop } from '../../hooks/useAdminBarbershop';
 import { barbershopService } from '../../services/barbershop.service';
+import { geocodingService } from '../../services/geocoding.service';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -44,6 +48,9 @@ export const BarbershopSettingsScreen: React.FC = () => {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [description, setDescription] = useState('');
+  const [latitude, setLatitude] = useState<string>('');
+  const [longitude, setLongitude] = useState<string>('');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [openingHours, setOpeningHours] = useState<OpeningHours>({
     monday: null,
     tuesday: null,
@@ -60,6 +67,8 @@ export const BarbershopSettingsScreen: React.FC = () => {
       setAddress(barbershop.address || '');
       setPhone(barbershop.phone || '');
       setDescription(barbershop.description || '');
+      setLatitude(barbershop.latitude?.toString() || '');
+      setLongitude(barbershop.longitude?.toString() || '');
       setOpeningHours(barbershop.opening_hours);
     }
   }, [barbershop]);
@@ -72,20 +81,40 @@ export const BarbershopSettingsScreen: React.FC = () => {
         throw new Error('El nombre es requerido');
       }
 
+      // Parse coordinates if provided
+      let lat: number | undefined;
+      let lng: number | undefined;
+
+      if (latitude.trim()) {
+        lat = parseFloat(latitude.trim());
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+          throw new Error('Latitud inválida (debe estar entre -90 y 90)');
+        }
+      }
+
+      if (longitude.trim()) {
+        lng = parseFloat(longitude.trim());
+        if (isNaN(lng) || lng < -180 || lng > 180) {
+          throw new Error('Longitud inválida (debe estar entre -180 y 180)');
+        }
+      }
+
       await barbershopService.updateBarbershop(barbershop.id, {
         name: name.trim(),
         address: address.trim() || undefined,
         phone: phone.trim() || undefined,
         description: description.trim() || undefined,
+        latitude: lat,
+        longitude: lng,
         opening_hours: openingHours,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-barbershop'] });
-      showToast('success', 'Configuración actualizada correctamente');
+      showToast.success('Configuración actualizada correctamente');
     },
     onError: (error: any) => {
-      showToast('error', error.message || 'Error al actualizar configuración');
+      showToast.error(error.message || 'Error al actualizar configuración');
     },
   });
 
@@ -106,6 +135,90 @@ export const BarbershopSettingsScreen: React.FC = () => {
       setOpeningHours({
         ...openingHours,
         [day]: { ...currentDay, [field]: value },
+      });
+    }
+  };
+
+  const handleGetCurrentLocation = async () => {
+    try {
+      setIsLoadingLocation(true);
+
+      // Request location permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permiso Denegado',
+          'Se necesita permiso de ubicación para obtener tu ubicación actual. Por favor, habilita los permisos de ubicación en la configuración de tu dispositivo.',
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            {
+              text: 'Abrir Configuración',
+              onPress: () => {
+                if (Platform.OS === 'ios') {
+                  Linking.openURL('app-settings:');
+                } else {
+                  Linking.openSettings();
+                }
+              },
+            },
+          ]
+        );
+        return;
+      }
+
+      // Get current location
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const lat = location.coords.latitude;
+      const lng = location.coords.longitude;
+
+      setLatitude(lat.toFixed(6));
+      setLongitude(lng.toFixed(6));
+
+      // Try to get address from coordinates
+      try {
+        const geocodingResult = await geocodingService.reverseGeocode(lat, lng);
+        if (geocodingResult && geocodingResult.address && !address.trim()) {
+          setAddress(geocodingResult.address);
+          showToast.success('Ubicación y dirección obtenidas correctamente');
+        } else {
+          showToast.success('Ubicación obtenida correctamente');
+        }
+      } catch (geocodingError) {
+        console.error('Geocoding error:', geocodingError);
+        showToast.success('Ubicación obtenida correctamente');
+      }
+    } catch (error: any) {
+      console.error('Error getting location:', error);
+      showToast.error('Error al obtener la ubicación: ' + error.message);
+    } finally {
+      setIsLoadingLocation(false);
+    }
+  };
+
+  const handleOpenInMaps = () => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      showToast.error('Coordenadas inválidas');
+      return;
+    }
+
+    const label = encodeURIComponent(name || 'Barbería');
+    const url = Platform.select({
+      ios: `maps:0,0?q=${label}@${lat},${lng}`,
+      android: `geo:0,0?q=${lat},${lng}(${label})`,
+    });
+
+    if (url) {
+      Linking.openURL(url).catch(() => {
+        // Fallback to Google Maps web
+        const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        Linking.openURL(webUrl);
       });
     }
   };
@@ -136,7 +249,7 @@ export const BarbershopSettingsScreen: React.FC = () => {
               sunday: { ...schedule },
             };
             setOpeningHours(newHours);
-            showToast('success', 'Horario copiado a todos los días');
+            showToast.success('Horario copiado a todos los días');
           },
         },
         {
@@ -150,7 +263,7 @@ export const BarbershopSettingsScreen: React.FC = () => {
               thursday: { ...schedule },
               friday: { ...schedule },
             });
-            showToast('success', 'Horario copiado a días laborales');
+            showToast.success('Horario copiado a días laborales');
           },
         },
       ]
@@ -216,6 +329,63 @@ export const BarbershopSettingsScreen: React.FC = () => {
           multiline
           numberOfLines={3}
         />
+      </Card>
+
+      <Card style={styles.section} variant="outlined">
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          Ubicación del Negocio
+        </Text>
+        <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
+          La ubicación permite que los clientes encuentren tu barbería en el mapa
+        </Text>
+
+        <View style={styles.locationActions}>
+          <Button
+            title={isLoadingLocation ? 'Obteniendo...' : '📍 Obtener Ubicación Actual (GPS)'}
+            onPress={handleGetCurrentLocation}
+            variant="primary"
+            loading={isLoadingLocation}
+            fullWidth
+          />
+          {latitude && longitude && (
+            <Button
+              title="🗺️ Ver en Mapa"
+              onPress={handleOpenInMaps}
+              variant="outline"
+              fullWidth
+            />
+          )}
+        </View>
+
+        <View style={styles.coordinatesContainer}>
+          <View style={styles.coordinateInput}>
+            <Input
+              label="Latitud"
+              value={latitude}
+              onChangeText={setLatitude}
+              placeholder="19.432608"
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={styles.coordinateInput}>
+            <Input
+              label="Longitud"
+              value={longitude}
+              onChangeText={setLongitude}
+              placeholder="-99.133209"
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
+
+        {latitude && longitude && (
+          <View style={[styles.locationInfo, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.locationInfoText, { color: colors.textSecondary }]}>
+              💡 Tip: Ve al negocio y usa "Obtener Ubicación Actual" para obtener las
+              coordenadas GPS, o ingrésalas manualmente desde Google Maps.
+            </Text>
+          </View>
+        )}
       </Card>
 
       <Card style={styles.section} variant="outlined">
@@ -369,5 +539,26 @@ const styles = StyleSheet.create({
   actions: {
     marginTop: spacing.md,
     marginBottom: spacing.xl,
+  },
+  locationActions: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  coordinatesContainer: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  coordinateInput: {
+    flex: 1,
+  },
+  locationInfo: {
+    padding: spacing.md,
+    borderRadius: 8,
+    marginTop: spacing.sm,
+  },
+  locationInfoText: {
+    ...typography.bodySmall,
+    lineHeight: 20,
   },
 });

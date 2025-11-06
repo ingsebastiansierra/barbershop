@@ -281,10 +281,10 @@ export const BookAppointmentScreen: React.FC<Props> = ({ route, navigation }) =>
                 )}
                 <View style={styles.barberRating}>
                   <Text style={[styles.ratingText, { color: colors.warning }]}>
-                    ⭐ {barber.rating.toFixed(1)}
+                    ⭐ {(barber.rating || 0).toFixed(1)}
                   </Text>
                   <Text style={[styles.reviewsText, { color: colors.textSecondary }]}>
-                    ({barber.total_reviews} reseñas)
+                    ({barber.total_reviews || 0} reseñas)
                   </Text>
                 </View>
               </View>

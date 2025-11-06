@@ -12,9 +12,14 @@ import {
   TouchableOpacity,
   Alert,
   Switch,
+  Platform,
+  Linking,
+  ActivityIndicator,
 } from 'react-native';
+import * as Location from 'expo-location';
 import { useThemeStore } from '../../store/themeStore';
 import { useAuth } from '../../hooks/useAuth';
+import { useAdminBarbershop } from '../../hooks/useAdminBarbershop';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { showToast } from '../../utils/toast';
@@ -22,6 +27,7 @@ import { showToast } from '../../utils/toast';
 export const AdminProfileScreen: React.FC = () => {
   const { colors, theme, setTheme } = useThemeStore();
   const { user, logout, updateProfile } = useAuth();
+  const { data: barbershop, isLoading: isLoadingBarbershop } = useAdminBarbershop();
 
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState(user?.full_name || '');
@@ -30,7 +36,7 @@ export const AdminProfileScreen: React.FC = () => {
 
   const handleSave = async () => {
     if (!fullName.trim()) {
-      showToast('error', 'El nombre es requerido');
+      showToast.error('El nombre es requerido');
       return;
     }
 
@@ -40,10 +46,10 @@ export const AdminProfileScreen: React.FC = () => {
         full_name: fullName.trim(),
         phone: phone.trim(),
       });
-      showToast('success', 'Perfil actualizado correctamente');
+      showToast.success('Perfil actualizado correctamente');
       setIsEditing(false);
     } catch (error: any) {
-      showToast('error', error.message || 'Error al actualizar perfil');
+      showToast.error(error.message || 'Error al actualizar perfil');
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +73,9 @@ export const AdminProfileScreen: React.FC = () => {
           onPress: async () => {
             try {
               await logout();
-              showToast('success', 'Sesión cerrada correctamente');
+              showToast.success('Sesión cerrada correctamente');
             } catch (error: any) {
-              showToast('error', error.message || 'Error al cerrar sesión');
+              showToast.error(error.message || 'Error al cerrar sesión');
             }
           },
         },
@@ -79,6 +85,29 @@ export const AdminProfileScreen: React.FC = () => {
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const handleOpenLocation = () => {
+    if (!barbershop?.latitude || !barbershop?.longitude) {
+      showToast.error('No hay ubicación configurada');
+      return;
+    }
+
+    const lat = barbershop.latitude;
+    const lng = barbershop.longitude;
+    const label = encodeURIComponent(barbershop.name || 'Barbería');
+    
+    const url = Platform.select({
+      ios: `maps:0,0?q=${label}@${lat},${lng}`,
+      android: `geo:0,0?q=${lat},${lng}(${label})`,
+    });
+
+    if (url) {
+      Linking.openURL(url).catch(() => {
+        const webUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        Linking.openURL(webUrl);
+      });
+    }
   };
 
   return (
@@ -195,14 +224,79 @@ export const AdminProfileScreen: React.FC = () => {
       </View>
 
       {/* Barbershop Info */}
-      {user?.barbershop_id && (
+      {barbershop && (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-            Barbería
+            Mi Barbería
           </Text>
-          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            ID: {user.barbershop_id}
-          </Text>
+          
+          <View style={styles.barbershopInfo}>
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
+                Nombre:
+              </Text>
+              <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
+                {barbershop.name}
+              </Text>
+            </View>
+
+            {barbershop.address && (
+              <View style={styles.infoRow}>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
+                  Dirección:
+                </Text>
+                <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
+                  {barbershop.address}
+                </Text>
+              </View>
+            )}
+
+            {barbershop.phone && (
+              <View style={styles.infoRow}>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
+                  Teléfono:
+                </Text>
+                <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
+                  {barbershop.phone}
+                </Text>
+              </View>
+            )}
+
+            {barbershop.latitude && barbershop.longitude && (
+              <>
+                <View style={styles.infoRow}>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
+                    Ubicación:
+                  </Text>
+                  <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
+                    {barbershop.latitude.toFixed(6)}, {barbershop.longitude.toFixed(6)}
+                  </Text>
+                </View>
+
+                <Button
+                  title="🗺️ Ver Ubicación en Mapa"
+                  onPress={handleOpenLocation}
+                  variant="outline"
+                  size="sm"
+                  style={styles.locationButton}
+                />
+              </>
+            )}
+
+            {(!barbershop.latitude || !barbershop.longitude) && (
+              <View style={[styles.warningBox, { backgroundColor: colors.warning + '20' }]}>
+                <Text style={[styles.warningText, { color: colors.warning }]}>
+                  ⚠️ No hay ubicación configurada. Ve a Configuración para agregar la ubicación del negocio.
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      )}
+
+      {isLoadingBarbershop && (
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <ActivityIndicator size="small" color={colors.primary} />
         </View>
       )}
 
@@ -318,6 +412,37 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
+  },
+  barbershopInfo: {
+    gap: 12,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 4,
+  },
+  infoLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    flex: 1,
+  },
+  infoValue: {
+    fontSize: 14,
+    flex: 2,
+    textAlign: 'right',
+  },
+  locationButton: {
+    marginTop: 8,
+  },
+  warningBox: {
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  warningText: {
+    fontSize: 13,
+    lineHeight: 18,
   },
   logoutButton: {
     marginTop: 8,

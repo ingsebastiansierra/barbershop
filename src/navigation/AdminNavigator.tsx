@@ -9,6 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AdminTabParamList, AdminStackParamList } from '../types/navigation';
 import { useThemeStore } from '../store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedTabBar } from '../components/common';
 
 // Tab Screens
 import { AdminDashboardScreen } from '../screens/admin/AdminDashboardScreen';
@@ -38,13 +39,10 @@ const AdminTabs: React.FC = () => {
 
   return (
     <Tab.Navigator
+      tabBar={(props) => <AnimatedTabBar {...props} />}
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-        },
         headerStyle: {
           backgroundColor: colors.background,
         },

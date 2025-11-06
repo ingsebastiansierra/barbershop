@@ -12,6 +12,9 @@ module.exports = {
         ios: {
             supportsTablet: true,
             bundleIdentifier: 'com.barbershop.manager',
+            config: {
+                googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY',
+            },
         },
         android: {
             package: 'com.barbershop.manager',
@@ -21,6 +24,11 @@ module.exports = {
                 'ACCESS_COARSE_LOCATION',
                 'NOTIFICATIONS',
             ],
+            config: {
+                googleMaps: {
+                    apiKey: process.env.GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY',
+                },
+            },
         },
         plugins: ['expo-notifications', 'expo-image-picker', 'expo-location'],
         extra: {

@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,7 +25,9 @@ import { useUpcomingAppointments } from '../../hooks/useAppointments';
 import { BarbershopCard } from '../../components/barbershop/BarbershopCard';
 import { AppointmentCard } from '../../components/appointment/AppointmentCard';
 import { Barbershop } from '../../types/models';
+import { Ionicons } from '@expo/vector-icons';
 
+const { width } = Dimensions.get('window');
 type NavigationProp = NativeStackNavigationProp<ClientStackParamList>;
 
 export const ClientHomeScreen: React.FC = () => {
@@ -96,18 +99,28 @@ export const ClientHomeScreen: React.FC = () => {
             {getUserDisplayName()}
           </Text>
         </View>
-        <TouchableOpacity
-          style={[
-            styles.avatar,
-            { backgroundColor: colors.primary + '20', borderColor: colors.primary },
-          ]}
-          onPress={() => navigation.navigate('ClientTabs', { screen: 'Profile' })}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.avatarText, { color: colors.primary }]}>
-            {getUserInitials()}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={[styles.notificationButton, { backgroundColor: colors.surface }]}
+            onPress={() => navigation.navigate('Notifications')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="notifications-outline" size={22} color={colors.textPrimary} />
+            <View style={[styles.badge, { backgroundColor: colors.error }]} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.avatar,
+              { backgroundColor: colors.primary + '20', borderColor: colors.primary },
+            ]}
+            onPress={() => navigation.navigate('ClientTabs', { screen: 'Profile' })}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.avatarText, { color: colors.primary }]}>
+              {getUserInitials()}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Search bar */}
@@ -116,13 +129,50 @@ export const ClientHomeScreen: React.FC = () => {
         onPress={handleSearchPress}
         activeOpacity={0.7}
       >
-        <Text style={[styles.searchIcon, { color: colors.textSecondary }]}>
-          🔍
-        </Text>
+        <Ionicons name="search" size={20} color={colors.textSecondary} />
         <Text style={[styles.searchPlaceholder, { color: colors.textSecondary }]}>
-          Buscar barberías...
+          Buscar barberías o barberos...
         </Text>
       </TouchableOpacity>
+
+      {/* Quick Actions */}
+      <View style={styles.quickActions}>
+        <TouchableOpacity
+          style={[styles.quickActionCard, { backgroundColor: colors.primary }]}
+          onPress={handleSearchPress}
+          activeOpacity={0.8}
+        >
+          <View style={styles.quickActionIcon}>
+            <Ionicons name="calendar" size={24} color="#FFFFFF" />
+          </View>
+          <Text style={styles.quickActionTitle}>Agendar Cita</Text>
+          <Text style={styles.quickActionSubtitle}>Reserva ahora</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.quickActionCard, { backgroundColor: colors.success }]}
+          onPress={() => navigation.navigate('History')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.quickActionIcon}>
+            <Ionicons name="time" size={24} color="#FFFFFF" />
+          </View>
+          <Text style={styles.quickActionTitle}>Historial</Text>
+          <Text style={styles.quickActionSubtitle}>Ver citas pasadas</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.quickActionCard, { backgroundColor: colors.warning }]}
+          onPress={handleSearchPress}
+          activeOpacity={0.8}
+        >
+          <View style={styles.quickActionIcon}>
+            <Ionicons name="star" size={24} color="#FFFFFF" />
+          </View>
+          <Text style={styles.quickActionTitle}>Favoritos</Text>
+          <Text style={styles.quickActionSubtitle}>Tus preferidos</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Próximas Citas Section */}
       <View style={styles.section}>
@@ -237,37 +287,96 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  notificationButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  badge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
   },
   avatarText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderRadius: 12,
-    marginBottom: 24,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  searchIcon: {
-    fontSize: 18,
-    marginRight: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+    gap: 12,
   },
   searchPlaceholder: {
     fontSize: 16,
+    flex: 1,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+    gap: 12,
+  },
+  quickActionCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  quickActionIcon: {
+    marginBottom: 8,
+  },
+  quickActionTitle: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  quickActionSubtitle: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    opacity: 0.9,
+    textAlign: 'center',
   },
   section: {
     marginBottom: 24,
