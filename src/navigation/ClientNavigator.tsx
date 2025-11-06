@@ -14,6 +14,7 @@ import { AnimatedTabBar } from '../components/common';
 // Tab Screens
 import { ClientHomeScreen } from '../screens/client/ClientHomeScreen';
 import { SearchScreen } from '../screens/client/SearchScreen';
+import { ClientShortsScreen } from '../screens/client/ClientShortsScreen';
 import { ClientAppointmentsScreen } from '../screens/client/ClientAppointmentsScreen';
 import { ClientProfileScreen } from '../screens/client/ClientProfileScreen';
 
@@ -33,10 +34,11 @@ const Stack = createNativeStackNavigator<ClientStackParamList>();
  */
 const ClientTabs: React.FC = () => {
   const { colors } = useThemeStore();
+  const [tabBarVisible, setTabBarVisible] = React.useState(true);
 
   return (
     <Tab.Navigator
-      tabBar={(props) => <AnimatedTabBar {...props} />}
+      tabBar={(props) => tabBarVisible ? <AnimatedTabBar {...props} /> : null}
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
@@ -45,6 +47,13 @@ const ClientTabs: React.FC = () => {
         },
         headerTintColor: colors.textPrimary,
         headerShadowVisible: false,
+      }}
+      screenListeners={{
+        state: (e) => {
+          const state = e.data.state;
+          const currentRoute = state.routes[state.index];
+          setTabBarVisible(currentRoute.name !== 'Shorts');
+        },
       }}
     >
       <Tab.Screen
@@ -64,6 +73,17 @@ const ClientTabs: React.FC = () => {
           title: 'Buscar',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Shorts"
+        component={ClientShortsScreen}
+        options={{
+          title: 'Shorts',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="film" size={size} color={color} />
           ),
         }}
       />

@@ -54,6 +54,11 @@ export enum UserGender {
   PREFER_NOT_TO_SAY = 'prefer_not_to_say',
 }
 
+export enum ShortMediaType {
+  VIDEO = 'video',
+  IMAGE = 'image',
+}
+
 // =====================================================
 // BASE TYPES
 // =====================================================
@@ -185,6 +190,58 @@ export interface HaircutStyle {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface BarberShort {
+  id: string;
+  barber_id: string;
+  barbershop_id: string;
+  media_type: ShortMediaType;
+  media_url: string;
+  thumbnail_url?: string;
+  duration?: number; // Duration in seconds (max 60 for videos)
+  title?: string;
+  description?: string;
+  tags?: string[];
+  views_count: number;
+  likes_count: number;
+  comments_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BarberShortWithDetails extends BarberShort {
+  barber: BarberWithUser;
+  barbershop: Barbershop;
+  is_liked_by_user?: boolean;
+}
+
+export interface ShortLike {
+  id: string;
+  short_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface ShortView {
+  id: string;
+  short_id: string;
+  user_id?: string;
+  viewed_at: string;
+}
+
+export interface ShortComment {
+  id: string;
+  short_id: string;
+  user_id: string;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ShortCommentWithUser extends ShortComment {
+  user: User;
 }
 
 export interface Appointment {
@@ -355,6 +412,25 @@ export interface CreateNotificationDto {
   body: string;
   type: NotificationType;
   data?: Record<string, any>;
+}
+
+export interface CreateBarberShortDto {
+  barber_id: string;
+  barbershop_id: string;
+  media_type: ShortMediaType;
+  media_url: string;
+  thumbnail_url?: string;
+  duration?: number;
+  title?: string;
+  description?: string;
+  tags?: string[];
+}
+
+export interface UpdateBarberShortDto {
+  title?: string;
+  description?: string;
+  tags?: string[];
+  is_active?: boolean;
 }
 
 // =====================================================

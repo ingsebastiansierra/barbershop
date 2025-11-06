@@ -24,6 +24,7 @@ export type AuthStackParamList = {
 export type ClientTabParamList = {
   Home: undefined;
   Search: undefined;
+  Shorts: undefined;
   Appointments: undefined;
   Profile: undefined;
 };
@@ -43,7 +44,7 @@ export type BarberTabParamList = {
   Schedule: undefined;
   Appointments: undefined;
   Sales: undefined;
-  History: undefined;
+  Shorts: undefined;
   Profile: undefined;
 };
 
@@ -52,6 +53,9 @@ export type BarberStackParamList = {
   AppointmentDetail: { appointmentId: string };
   ClientProfile: { clientId: string };
   Notifications: undefined;
+  Shorts: undefined;
+  UploadShort: undefined;
+  ShortDetail: { shortId: string };
 };
 
 // Admin Navigator

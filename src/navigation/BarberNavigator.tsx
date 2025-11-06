@@ -25,6 +25,9 @@ import { BarberAppointmentDetailScreen } from '../screens/barber/BarberAppointme
 import { ClientProfileScreen } from '../screens/barber/ClientProfileScreen';
 import { BarberNotificationsScreen } from '../screens/barber/BarberNotificationsScreen';
 import { BarberPendingScreen } from '../screens/barber/BarberPendingScreen';
+import { BarberShortsScreen } from '../screens/barber/BarberShortsScreen';
+import { UploadShortScreen } from '../screens/barber/UploadShortScreen';
+import { ShortDetailScreen } from '../screens/barber/ShortDetailScreen';
 
 const Tab = createBottomTabNavigator<BarberTabParamList>();
 const Stack = createNativeStackNavigator<BarberStackParamList>();
@@ -79,12 +82,12 @@ const BarberTabs: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="History"
-        component={BarberHistoryScreen}
+        name="Shorts"
+        component={BarberShortsScreen}
         options={{
-          title: 'Historial',
+          title: 'Shorts',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="time-outline" size={size} color={color} />
+            <Ionicons name="film-outline" size={size} color={color} />
           ),
         }}
       />
@@ -172,6 +175,22 @@ export const BarberNavigator: React.FC = () => {
         component={BarberNotificationsScreen}
         options={{
           title: 'Notificaciones',
+          headerBackTitle: 'Atrás',
+        }}
+      />
+      <Stack.Screen
+        name="UploadShort"
+        component={UploadShortScreen}
+        options={{
+          title: 'Subir Short',
+          headerBackTitle: 'Atrás',
+        }}
+      />
+      <Stack.Screen
+        name="ShortDetail"
+        component={ShortDetailScreen}
+        options={{
+          title: 'Detalle del Short',
           headerBackTitle: 'Atrás',
         }}
       />

@@ -4,6 +4,7 @@
 
 export { ClientHomeScreen } from './ClientHomeScreen';
 export { SearchScreen } from './SearchScreen';
+export { ClientShortsScreen } from './ClientShortsScreen';
 export { ClientAppointmentsScreen } from './ClientAppointmentsScreen';
 export { ClientProfileScreen } from './ClientProfileScreen';
 export { BarbershopDetailScreen } from './BarbershopDetailScreen';
