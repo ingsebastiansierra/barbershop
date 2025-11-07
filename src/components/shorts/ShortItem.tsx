@@ -17,7 +17,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { BarberShortWithDetails } from '../../types/models';
 import { VideoPlayer } from './VideoPlayer';
 
-const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+const SCREEN_DIMENSIONS = Dimensions.get('screen');
+const SCREEN_HEIGHT = SCREEN_DIMENSIONS.height;
+const SCREEN_WIDTH = SCREEN_DIMENSIONS.width;
 
 interface ShortItemProps {
   item: BarberShortWithDetails;
@@ -25,10 +27,6 @@ interface ShortItemProps {
   onLike: (short: BarberShortWithDetails) => void;
   onComment: (short: BarberShortWithDetails) => void;
   onShare: (short: BarberShortWithDetails) => void;
-}
-
-interface VideoPlayerRef {
-  togglePlayPause: () => void;
 }
 
 export const ShortItem: React.FC<ShortItemProps> = ({
@@ -42,7 +40,13 @@ export const ShortItem: React.FC<ShortItemProps> = ({
   const [isPaused, setIsPaused] = useState(false);
   const heartScale = useRef(new Animated.Value(0)).current;
   const lastTap = useRef<number>(0);
-  const videoRef = useRef<any>(null);
+
+  // Reset pause state when video becomes inactive
+  React.useEffect(() => {
+    if (!isActive) {
+      setIsPaused(false);
+    }
+  }, [isActive]);
 
   const handleTap = () => {
     const now = Date.now();
@@ -81,7 +85,6 @@ export const ShortItem: React.FC<ShortItemProps> = ({
     <View style={styles.shortContainer}>
       {/* Video Player */}
       <VideoPlayer 
-        ref={videoRef}
         uri={item.media_url} 
         autoPlay={isActive && !isPaused}
       />
@@ -187,9 +190,11 @@ export const ShortItem: React.FC<ShortItemProps> = ({
 
 const styles = StyleSheet.create({
   shortContainer: {
+    flex: 1,
     height: SCREEN_HEIGHT,
     width: SCREEN_WIDTH,
     position: 'relative',
+    backgroundColor: '#000',
   },
   tapOverlay: {
     position: 'absolute',
@@ -239,11 +244,11 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 50,
     left: 0,
     right: 80,
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 16,
   },
   barberInfo: {
     marginBottom: 8,

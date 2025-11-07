@@ -3,7 +3,7 @@
  * TikTok-style shorts feed for clients
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   FlatList,
@@ -14,10 +14,11 @@ import {
   StyleSheet,
   SafeAreaView,
   Share,
+  AppState,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../../store/authStore';
 import { useThemeStore } from '../../store/themeStore';
 import { getShortsWithLikeStatus, likeShort, unlikeShort, recordShortView } from '../../services/shortsService';
@@ -25,7 +26,9 @@ import { BarberShortWithDetails } from '../../types/models';
 import { ShortItem, CommentsModal } from '../../components/shorts';
 import Toast from 'react-native-toast-message';
 
-const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+const SCREEN_DIMENSIONS = Dimensions.get('screen');
+const SCREEN_HEIGHT = SCREEN_DIMENSIONS.height;
+const SCREEN_WIDTH = SCREEN_DIMENSIONS.width;
 
 export const ClientShortsScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -35,12 +38,51 @@ export const ClientShortsScreen: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalVisible, setCommentsModalVisible] = useState(false);
   const [selectedShortId, setSelectedShortId] = useState<string | null>(null);
+  const [isScreenFocused, setIsScreenFocused] = useState(true);
   const flatListRef = useRef<FlatList>(null);
+
+  // Pause video when screen loses focus
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsScreenFocused(true);
+      return () => {
+        setIsScreenFocused(false);
+      };
+    }, [])
+  );
+
+  // Pause video when app goes to background
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        setIsScreenFocused(false);
+      } else if (nextAppState === 'active') {
+        setIsScreenFocused(true);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // Fetch shorts
   const { data: shorts = [], isLoading } = useQuery({
     queryKey: ['shorts-feed', user?.id],
-    queryFn: () => user?.id ? getShortsWithLikeStatus(user.id, 50, 0) : [],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const result = await getShortsWithLikeStatus(user.id, 50, 0);
+      console.log('Shorts loaded in screen:', result.map(s => ({
+        id: s.id,
+        likes: s.likes_count,
+        comments: s.comments_count,
+      })));
+      return result;
+    },
+    staleTime: 0,
+    cacheTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
   });
 
   // Like/Unlike mutation
@@ -66,10 +108,12 @@ export const ClientShortsScreen: React.FC = () => {
         if (!old) return old;
         return old.map((short: BarberShortWithDetails) => {
           if (short.id === shortId) {
+            const newLikesCount = isLiked ? Math.max(0, (short.likes_count || 0) - 1) : (short.likes_count || 0) + 1;
+            console.log('Updating like:', { shortId, isLiked, oldCount: short.likes_count, newCount: newLikesCount });
             return {
               ...short,
               is_liked_by_user: !isLiked,
-              likes_count: isLiked ? short.likes_count - 1 : short.likes_count + 1,
+              likes_count: newLikesCount,
             };
           }
           return short;
@@ -77,6 +121,10 @@ export const ClientShortsScreen: React.FC = () => {
       });
 
       return { previousShorts };
+    },
+    onSuccess: () => {
+      // Force refetch to get accurate data from server
+      queryClient.invalidateQueries({ queryKey: ['shorts-feed'] });
     },
     onError: (error: any, variables, context: any) => {
       // Rollback on error
@@ -88,9 +136,6 @@ export const ClientShortsScreen: React.FC = () => {
         text1: 'Error',
         text2: error.message || 'No se pudo actualizar el like',
       });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['shorts-feed'] });
     },
   });
 
@@ -137,7 +182,7 @@ export const ClientShortsScreen: React.FC = () => {
   };
 
   const renderShortItem = ({ item, index }: { item: BarberShortWithDetails; index: number }) => {
-    const isActive = index === currentIndex;
+    const isActive = index === currentIndex && isScreenFocused;
 
     return (
       <ShortItem
@@ -169,6 +214,11 @@ export const ClientShortsScreen: React.FC = () => {
     );
   }
 
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['shorts-feed'] });
+    queryClient.refetchQueries({ queryKey: ['shorts-feed'] });
+  };
+
   return (
     <View style={styles.container}>
       {/* Back button */}
@@ -180,6 +230,12 @@ export const ClientShortsScreen: React.FC = () => {
           <Ionicons name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Shorts</Text>
+        <TouchableOpacity
+          style={styles.refreshButton}
+          onPress={handleRefresh}
+        >
+          <Ionicons name="refresh" size={24} color="#fff" />
+        </TouchableOpacity>
       </SafeAreaView>
 
       <FlatList
@@ -208,7 +264,11 @@ export const ClientShortsScreen: React.FC = () => {
         <CommentsModal
           visible={commentsModalVisible}
           shortId={selectedShortId}
-          onClose={() => setCommentsModalVisible(false)}
+          onClose={() => {
+            setCommentsModalVisible(false);
+            // Refetch shorts to update comment count
+            queryClient.invalidateQueries({ queryKey: ['shorts-feed'] });
+          }}
         />
       )}
     </View>
@@ -229,8 +289,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 48,
-    paddingBottom: 12,
+    paddingTop: 50,
+    paddingBottom: 8,
+    backgroundColor: 'transparent',
   },
   backButton: {
     width: 40,
@@ -244,10 +305,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '700',
+    flex: 1,
     marginLeft: 16,
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
+  },
+  refreshButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingContainer: {
     flex: 1,

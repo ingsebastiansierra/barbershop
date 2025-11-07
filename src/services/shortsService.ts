@@ -30,6 +30,14 @@ export const getActiveShorts = async (
   if (error) throw error;
   if (!shorts || shorts.length === 0) return [];
 
+  // Log para debug
+  console.log('Shorts from DB:', shorts.map(s => ({
+    id: s.id,
+    title: s.title,
+    likes_count: s.likes_count,
+    comments_count: s.comments_count,
+  })));
+
   // Get unique barber and barbershop IDs
   const barberIds = [...new Set(shorts.map(s => s.barber_id))];
   const barbershopIds = [...new Set(shorts.map(s => s.barbershop_id))];
