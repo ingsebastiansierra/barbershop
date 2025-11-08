@@ -24,6 +24,7 @@ import { serviceService } from '../../services/service.service';
 import { barbershopService } from '../../services/barbershop.service';
 import { BarberWithUser, Service } from '../../types/models';
 import { Button } from '../../components/common/Button';
+import { ChatButton } from '../../components/chat';
 
 type Props = NativeStackScreenProps<ClientStackParamList, 'BarbershopDetail'>;
 
@@ -85,39 +86,50 @@ export const BarbershopDetailScreen: React.FC<Props> = ({ route, navigation }) =
   );
 
   const renderBarberItem = ({ item }: { item: BarberWithUser }) => (
-    <TouchableOpacity
-      style={[styles.barberCard, { backgroundColor: colors.surface }]}
-      onPress={() => handleBarberPress(item.id)}
-      activeOpacity={0.7}
-    >
-      {item.user.avatar ? (
-        <Image source={{ uri: item.user.avatar }} style={styles.barberAvatar} />
-      ) : (
-        <View style={[styles.barberAvatarPlaceholder, { backgroundColor: colors.primary + '20' }]}>
-          <Text style={[styles.barberAvatarText, { color: colors.primary }]}>
-            {item.user.full_name.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-      )}
-      <View style={styles.barberInfo}>
-        <Text style={[styles.barberName, { color: colors.textPrimary }]}>
-          {item.user.full_name}
-        </Text>
-        {item.specialties.length > 0 && (
-          <Text style={[styles.barberSpecialties, { color: colors.textSecondary }]}>
-            {item.specialties.join(', ')}
-          </Text>
+    <View style={[styles.barberCard, { backgroundColor: colors.surface }]}>
+      <TouchableOpacity
+        style={styles.barberCardContent}
+        onPress={() => handleBarberPress(item.id)}
+        activeOpacity={0.7}
+      >
+        {item.user.avatar ? (
+          <Image source={{ uri: item.user.avatar }} style={styles.barberAvatar} />
+        ) : (
+          <View style={[styles.barberAvatarPlaceholder, { backgroundColor: colors.primary + '20' }]}>
+            <Text style={[styles.barberAvatarText, { color: colors.primary }]}>
+              {item.user.full_name.charAt(0).toUpperCase()}
+            </Text>
+          </View>
         )}
-        <View style={styles.barberRating}>
-          <Text style={[styles.ratingText, { color: colors.warning }]}>
-            ⭐ {(item.rating || 0).toFixed(1)}
+        <View style={styles.barberInfo}>
+          <Text style={[styles.barberName, { color: colors.textPrimary }]}>
+            {item.user.full_name}
           </Text>
-          <Text style={[styles.reviewsText, { color: colors.textSecondary }]}>
-            ({item.total_reviews || 0} reseñas)
-          </Text>
+          {item.specialties.length > 0 && (
+            <Text style={[styles.barberSpecialties, { color: colors.textSecondary }]}>
+              {item.specialties.join(', ')}
+            </Text>
+          )}
+          <View style={styles.barberRating}>
+            <Text style={[styles.ratingText, { color: colors.warning }]}>
+              ⭐ {(item.rating || 0).toFixed(1)}
+            </Text>
+            <Text style={[styles.reviewsText, { color: colors.textSecondary }]}>
+              ({item.total_reviews || 0} reseñas)
+            </Text>
+          </View>
         </View>
+      </TouchableOpacity>
+      <View style={styles.barberActions}>
+        <ChatButton
+          barberId={item.id}
+          barberName={item.user.full_name}
+          barberAvatar={item.user.avatar}
+          variant="secondary"
+          size="small"
+        />
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   const renderReviewsTab = () => (
@@ -501,6 +513,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
+    alignItems: 'center',
+  },
+  barberCardContent: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  barberActions: {
+    marginLeft: 8,
+    justifyContent: 'center',
   },
   barberAvatar: {
     width: 60,

@@ -13,6 +13,7 @@ import {
   Alert,
   Switch,
   Modal,
+  Image,
 } from 'react-native';
 import { useThemeStore } from '../../store/themeStore';
 import { useAuth } from '../../hooks/useAuth';
@@ -126,7 +127,83 @@ export const ClientProfileScreen: React.FC = () => {
   };
 
   const handleChangeAvatar = () => {
-    showToast.info('Funcionalidad de cambio de foto próximamente');
+    Alert.alert(
+      'Cambiar Foto de Perfil',
+      'Selecciona una opción',
+      [
+        {
+          text: 'Tomar Foto',
+          onPress: handleTakePhoto,
+        },
+        {
+          text: 'Elegir de Galería',
+          onPress: handlePickFromGallery,
+        },
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  const handleTakePhoto = async () => {
+    try {
+      if (!user?.id) return;
+
+      showToast.loading('Tomando foto...');
+      
+      const { profileService } = await import('../../services/profileService');
+      const newAvatarUrl = await profileService.takeProfilePhoto(
+        user.id,
+        user.avatar_url
+      );
+
+      // Actualizar el estado local
+      if (updateProfile) {
+        await updateProfile({ avatar_url: newAvatarUrl });
+      }
+
+      showToast.success('Foto de perfil actualizada', '📸 ¡Genial!');
+    } catch (error: any) {
+      console.error('Error taking photo:', error);
+      showToast.error(
+        error.message || 'No se pudo actualizar la foto',
+        'Error'
+      );
+    }
+  };
+
+  const handlePickFromGallery = async () => {
+    try {
+      if (!user?.id) return;
+
+      showToast.loading('Subiendo foto...');
+      
+      const { profileService } = await import('../../services/profileService');
+      const newAvatarUrl = await profileService.changeProfilePhoto(
+        user.id,
+        user.avatar_url
+      );
+
+      // Actualizar el estado local
+      if (updateProfile) {
+        await updateProfile({ avatar_url: newAvatarUrl });
+      }
+
+      showToast.success('Foto de perfil actualizada', '✨ ¡Se ve genial!');
+    } catch (error: any) {
+      console.error('Error picking photo:', error);
+      
+      if (error.message === 'No se seleccionó ninguna imagen') {
+        return; // Usuario canceló, no mostrar error
+      }
+      
+      showToast.error(
+        error.message || 'No se pudo actualizar la foto',
+        'Error'
+      );
+    }
   };
 
   return (
@@ -142,10 +219,18 @@ export const ClientProfileScreen: React.FC = () => {
             { backgroundColor: colors.primary + '20', borderColor: colors.primary },
           ]}
           onPress={handleChangeAvatar}
+          activeOpacity={0.7}
         >
-          <Text style={[styles.avatarText, { color: colors.primary }]}>
-            {getUserInitials()}
-          </Text>
+          {user?.avatar_url ? (
+            <Image
+              source={{ uri: user.avatar_url }}
+              style={styles.avatarImage}
+            />
+          ) : (
+            <Text style={[styles.avatarText, { color: colors.primary }]}>
+              {getUserInitials()}
+            </Text>
+          )}
           <View style={[styles.editBadge, { backgroundColor: colors.primary }]}>
             <Text style={styles.editBadgeText}>✏️</Text>
           </View>
@@ -474,6 +559,11 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     marginBottom: 16,
     position: 'relative',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
   avatarText: {
     fontSize: 36,

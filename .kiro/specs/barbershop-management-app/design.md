@@ -743,7 +743,7 @@ const lightColors = {
   success: '#10B981',        // Green-500
   warning: '#F59E0B',        // Amber-500
   error: '#EF4444',          // Red-500
-  info: '#3B82F6',           // Blue-500
+  info: '#582308',           // Brown-barbershop
   
   // Borders
   border: '#E5E7EB',         // Gray-200

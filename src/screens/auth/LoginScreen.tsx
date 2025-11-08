@@ -19,6 +19,8 @@ import { AuthStackParamList } from '../../types/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
+import { SuccessModal } from '../../components/common/SuccessModal';
+import { AuthHero } from '../../components/auth/AuthHero';
 import { useThemeStore } from '../../store/themeStore';
 import { typography, spacing } from '../../styles/theme';
 import { validateEmail } from '../../utils/validation';
@@ -42,6 +44,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [emailError, setEmailError] = useState<string>();
   const [passwordError, setPasswordError] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const validateForm = (): boolean => {
     let isValid = true;
@@ -76,7 +79,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
     try {
       showToast.loading('Iniciando sesión...');
       await login(email.trim(), password);
-      showToast.success('¡Bienvenido de nuevo!', '✅ Inicio de sesión exitoso');
+      setShowSuccessModal(true);
       // Navigation is handled by RootNavigator based on auth state
     } catch (error: any) {
       console.error('Login error:', error);
@@ -119,10 +122,14 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
+        {/* Hero */}
+        <AuthHero size="large" />
+
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.textPrimary }]}>
-            Bienvenido
+            ¡Bienvenido de nuevo! 👋
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Inicia sesión para continuar
@@ -193,6 +200,14 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <SuccessModal
+        visible={showSuccessModal}
+        title="¡Inicio de sesión exitoso!"
+        message="Bienvenido de nuevo. Estás siendo redirigido..."
+        onClose={() => setShowSuccessModal(false)}
+        buttonText="Continuar"
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -203,20 +218,22 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xxl,
   },
   header: {
-    marginBottom: spacing.xxl,
+    marginBottom: spacing.xl,
     alignItems: 'center',
   },
   title: {
     ...typography.h1,
     marginBottom: spacing.xs,
+    textAlign: 'center',
   },
   subtitle: {
     ...typography.bodyLarge,
+    textAlign: 'center',
   },
   form: {
     marginBottom: spacing.xl,
@@ -232,11 +249,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: spacing.lg,
   },
   footerText: {
     ...typography.bodyMedium,
   },
   registerLink: {
     ...typography.labelLarge,
+    fontWeight: '600',
   },
 });

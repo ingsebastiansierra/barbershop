@@ -20,6 +20,8 @@ import { AuthStackParamList } from '../../types/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
+import { SuccessModal } from '../../components/common/SuccessModal';
+import { AuthHero } from '../../components/auth/AuthHero';
 import { useThemeStore } from '../../store/themeStore';
 import { typography, spacing } from '../../styles/theme';
 import { validateEmail, validatePassword, getPasswordError, validatePhone } from '../../utils/validation';
@@ -57,6 +59,8 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [confirmPasswordError, setConfirmPasswordError] = useState<string>();
   const [barbershopError, setBarbershopError] = useState<string>();
   const [loadingBarbershops, setLoadingBarbershops] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState({ title: '', message: '' });
 
   // Load barbershops when user selects barber type
   useEffect(() => {
@@ -167,16 +171,11 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         // Register as client (normal flow)
         await register(email.trim(), password, nombre.trim(), telefono.trim());
         
-        Alert.alert(
-          'Registro exitoso',
-          'Se ha enviado un email de verificación a tu correo. Por favor verifica tu cuenta antes de iniciar sesión.',
-          [
-            {
-              text: 'OK',
-              onPress: () => navigation.navigate('VerifyEmail', { email: email.trim() }),
-            },
-          ]
-        );
+        setSuccessMessage({
+          title: '¡Registro exitoso! 🎉',
+          message: 'Se ha enviado un email de verificación a tu correo. Por favor verifica tu cuenta antes de iniciar sesión.',
+        });
+        setShowSuccessModal(true);
       } else {
         // Register as barber with pending status
         const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -212,16 +211,11 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           // Don't throw error, the trigger might have created it
         }
 
-        Alert.alert(
-          '¡Solicitud Enviada!',
-          'Tu solicitud para trabajar como barbero ha sido enviada. El administrador de la barbería la revisará pronto.\n\nRecibirás una notificación cuando sea aprobada.',
-          [
-            {
-              text: 'OK',
-              onPress: () => navigation.navigate('Login'),
-            },
-          ]
-        );
+        setSuccessMessage({
+          title: '¡Solicitud Enviada! 🎉',
+          message: 'Tu solicitud para trabajar como barbero ha sido enviada. El administrador de la barbería la revisará pronto. Recibirás una notificación cuando sea aprobada.',
+        });
+        setShowSuccessModal(true);
       }
     } catch (error: any) {
       Alert.alert(
@@ -236,6 +230,15 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate('Login');
   };
 
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    if (userType === 'client') {
+      navigation.navigate('VerifyEmail', { email: email.trim() });
+    } else {
+      navigation.navigate('Login');
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -244,10 +247,14 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
+        {/* Hero */}
+        <AuthHero size="small" />
+
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.textPrimary }]}>
-            Crear Cuenta
+            Crear Cuenta ✨
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Completa tus datos para registrarte
@@ -488,6 +495,14 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <SuccessModal
+        visible={showSuccessModal}
+        title={successMessage.title}
+        message={successMessage.message}
+        onClose={handleSuccessModalClose}
+        buttonText="Continuar"
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -498,17 +513,18 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xxl,
   },
   header: {
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
     alignItems: 'center',
   },
   title: {
     ...typography.h1,
     marginBottom: spacing.xs,
+    textAlign: 'center',
   },
   subtitle: {
     ...typography.bodyLarge,
@@ -530,12 +546,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: spacing.lg,
   },
   footerText: {
     ...typography.bodyMedium,
   },
   loginLink: {
     ...typography.labelLarge,
+    fontWeight: '600',
   },
   selectorContainer: {
     marginBottom: spacing.lg,

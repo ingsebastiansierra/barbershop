@@ -19,6 +19,7 @@ import { useThemeStore } from '../../store/themeStore';
 import { useAppointment, useAppointmentMutations } from '../../hooks/useAppointments';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
+import { ChatButton } from '../../components/chat';
 import { AppointmentStatus } from '../../types/models';
 import { formatTimeForDisplay } from '../../utils/availability';
 import { format } from 'date-fns';
@@ -229,6 +230,22 @@ export const BarberAppointmentDetailScreen: React.FC<Props> = ({ route, navigati
             )}
           </View>
         </View>
+        
+        {/* Chat Button */}
+        {appointment.client && (
+          <View style={styles.chatSection}>
+            <Text style={[styles.chatLabel, { color: colors.textSecondary }]}>
+              Contactar cliente
+            </Text>
+            <ChatButton
+              barberId={appointment.client.id}
+              barberName={appointment.client.full_name || 'Cliente'}
+              barberAvatar={appointment.client.avatar_url}
+              variant="primary"
+              size="medium"
+            />
+          </View>
+        )}
       </View>
 
       {/* Service Information */}
@@ -424,6 +441,16 @@ const styles = StyleSheet.create({
   clientContact: {
     fontSize: 14,
     marginBottom: 2,
+  },
+  chatSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  chatLabel: {
+    fontSize: 14,
+    marginBottom: 8,
   },
   serviceName: {
     fontSize: 18,

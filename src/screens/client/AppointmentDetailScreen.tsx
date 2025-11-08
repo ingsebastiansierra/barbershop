@@ -21,6 +21,7 @@ import {
   useCancelAppointment,
 } from '../../hooks/useAppointments';
 import { Button } from '../../components/common/Button';
+import { ChatButton } from '../../components/chat';
 import { AppointmentStatus } from '../../types/models';
 import { formatTimeForDisplay } from '../../utils/availability';
 import { serviceService } from '../../services/service.service';
@@ -226,6 +227,22 @@ export const AppointmentDetailScreen: React.FC<Props> = ({ route, navigation }) 
             )}
           </View>
         </View>
+        
+        {/* Chat Button */}
+        {appointment.barber && (
+          <View style={styles.chatSection}>
+            <Text style={[styles.chatLabel, { color: colors.textSecondary }]}>
+              ¿Tienes alguna pregunta?
+            </Text>
+            <ChatButton
+              barberId={appointment.barber.id}
+              barberName={appointment.barber.user?.nombre || 'Barbero'}
+              barberAvatar={appointment.barber.user?.avatar}
+              variant="primary"
+              size="medium"
+            />
+          </View>
+        )}
       </View>
 
       {/* Service Info */}
@@ -490,6 +507,16 @@ const styles = StyleSheet.create({
   },
   reviewsText: {
     fontSize: 12,
+  },
+  chatSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  chatLabel: {
+    fontSize: 14,
+    marginBottom: 8,
   },
   serviceName: {
     fontSize: 18,

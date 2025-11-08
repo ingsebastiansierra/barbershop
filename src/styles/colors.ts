@@ -1,18 +1,22 @@
 /**
  * Color Palette for Light and Dark Themes
- * Based on design system specifications
+ * Trimly - Barbershop App Theme
  */
 
 export const lightColors = {
-  // Primary
-  primary: '#6366F1',        // Indigo-500
-  primaryDark: '#4F46E5',    // Indigo-600
-  primaryLight: '#818CF8',   // Indigo-400
+  // Primary - Marrón Barbería
+  primary: '#582308',        // Brown-barbershop
+  primaryDark: '#3D1806',    // Darker brown
+  primaryLight: '#7A3010',   // Lighter brown
   
-  // Secondary
-  secondary: '#EC4899',      // Pink-500
-  secondaryDark: '#DB2777',  // Pink-600
-  secondaryLight: '#F472B6', // Pink-400
+  // Secondary - Dorado/Beige
+  secondary: '#D4A574',      // Gold/Beige
+  secondaryDark: '#B8894F',  // Darker gold
+  secondaryLight: '#E5C9A3', // Lighter beige
+  
+  // Accent
+  accent: '#C19A6B',         // Camel/Tan
+  accentLight: '#D4B896',    // Light tan
   
   // Neutrals
   background: '#FFFFFF',
@@ -28,7 +32,7 @@ export const lightColors = {
   success: '#10B981',        // Green-500
   warning: '#F59E0B',        // Amber-500
   error: '#EF4444',          // Red-500
-  info: '#3B82F6',           // Blue-500
+  info: '#582308',           // Brown-barbershop
   
   // Borders
   border: '#E5E7EB',         // Gray-200
@@ -36,15 +40,19 @@ export const lightColors = {
 } as const;
 
 export const darkColors = {
-  // Primary
-  primary: '#818CF8',        // Indigo-400
-  primaryDark: '#6366F1',    // Indigo-500
-  primaryLight: '#A5B4FC',   // Indigo-300
+  // Primary - Marrón Barbería (más claro en dark mode)
+  primary: '#D4A574',        // Gold/Beige
+  primaryDark: '#B8894F',    // Darker gold
+  primaryLight: '#E5C9A3',   // Lighter beige
   
   // Secondary
-  secondary: '#F472B6',      // Pink-400
-  secondaryDark: '#EC4899',  // Pink-500
-  secondaryLight: '#F9A8D4', // Pink-300
+  secondary: '#C19A6B',      // Camel/Tan
+  secondaryDark: '#A67C52',  // Darker tan
+  secondaryLight: '#D4B896', // Light tan
+  
+  // Accent
+  accent: '#7A3010',         // Brown accent
+  accentLight: '#8F4520',    // Lighter brown
   
   // Neutrals
   background: '#111827',     // Gray-900
@@ -60,7 +68,7 @@ export const darkColors = {
   success: '#34D399',        // Green-400
   warning: '#FBBF24',        // Amber-400
   error: '#F87171',          // Red-400
-  info: '#60A5FA',           // Blue-400
+  info: '#D4A574',           // Gold (info in dark mode)
   
   // Borders
   border: '#374151',         // Gray-700

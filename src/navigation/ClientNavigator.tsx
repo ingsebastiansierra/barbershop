@@ -26,6 +26,9 @@ import { AppointmentDetailScreen } from '../screens/client/AppointmentDetailScre
 import { NotificationsScreen } from '../screens/client/NotificationsScreen';
 import { HistoryScreen } from '../screens/client/HistoryScreen';
 
+// Chat Screens
+import { ConversationsScreen, ChatScreen } from '../screens/common';
+
 const Tab = createBottomTabNavigator<ClientTabParamList>();
 const Stack = createNativeStackNavigator<ClientStackParamList>();
 
@@ -94,6 +97,16 @@ const ClientTabs: React.FC = () => {
           title: 'Citas',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={ConversationsScreen}
+        options={{
+          title: 'Mensajes',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubbles" size={size} color={color} />
           ),
         }}
       />
@@ -183,6 +196,14 @@ export const ClientNavigator: React.FC = () => {
         component={HistoryScreen}
         options={{
           title: 'Historial',
+          headerBackTitle: 'Atrás',
+        }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          headerShown: true,
           headerBackTitle: 'Atrás',
         }}
       />

@@ -27,7 +27,7 @@ import { supabase } from '../../supabase/client';
 import { useAuth } from '../../hooks/useAuth';
 
 const ROLE_OPTIONS = [
-  { value: 'client', label: 'Cliente', icon: '👤', color: '#3B82F6' },
+  { value: 'client', label: 'Cliente', icon: '👤', color: '#582308' },
   { value: 'barber', label: 'Barbero', icon: '✂️', color: '#10B981' },
   { value: 'admin', label: 'Admin', icon: '👔', color: '#F59E0B' },
   { value: 'super_admin', label: 'Super Admin', icon: '👑', color: '#EF4444' },

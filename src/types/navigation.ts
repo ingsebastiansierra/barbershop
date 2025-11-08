@@ -26,6 +26,7 @@ export type ClientTabParamList = {
   Search: undefined;
   Shorts: undefined;
   Appointments: undefined;
+  Messages: undefined;
   Profile: undefined;
 };
 
@@ -37,6 +38,15 @@ export type ClientStackParamList = {
   AppointmentDetail: { appointmentId: string };
   Notifications: undefined;
   History: undefined;
+  Conversations: undefined;
+  Chat: {
+    conversationId: string;
+    otherUser: {
+      id: string;
+      full_name: string;
+      avatar_url?: string;
+    };
+  };
 };
 
 // Barber Navigator
@@ -45,6 +55,7 @@ export type BarberTabParamList = {
   Appointments: undefined;
   Sales: undefined;
   Shorts: undefined;
+  Messages: undefined;
   Profile: undefined;
 };
 
@@ -56,6 +67,15 @@ export type BarberStackParamList = {
   Shorts: undefined;
   UploadShort: undefined;
   ShortDetail: { shortId: string };
+  Conversations: undefined;
+  Chat: {
+    conversationId: string;
+    otherUser: {
+      id: string;
+      full_name: string;
+      avatar_url?: string;
+    };
+  };
 };
 
 // Admin Navigator

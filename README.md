@@ -1,194 +1,120 @@
-# 💈 Barbershop Manager
+# Trimly ✂️
 
-Sistema de gestión para barberías desarrollado con React Native y Expo.
+**Tu barbería en un toque**
 
-## 🚀 Características
+Trimly es una aplicación móvil moderna para la gestión de barberías que conecta clientes con barberos profesionales. Ofrece una experiencia completa de reservas, gestión de citas, y contenido visual tipo "Shorts" para mostrar estilos de corte.
 
-- ✅ Sistema de autenticación con roles (Cliente, Barbero, Admin, Super Admin)
-- ✅ Gestión de citas y reservas
-- ✅ Perfiles de usuario personalizados
-- ✅ Recuperación de contraseña por email
-- ✅ Notificaciones Toast profesionales
-- ✅ Tema claro/oscuro
-- ✅ Base de datos Supabase
+## 🎯 Características Principales
 
-## 📦 Tecnologías
+### Para Clientes
+- 📱 Registro e inicio de sesión seguro
+- 🔍 Búsqueda de barberías cercanas con mapas
+- 📅 Sistema de reservas en tiempo real
+- 👀 Visualización de estilos de corte (Shorts)
+- ⭐ Calificaciones y reseñas
+- 📍 Geolocalización de barberías
+- 🔔 Notificaciones de citas
 
-- **React Native** - Framework móvil
-- **Expo** - Herramientas de desarrollo
-- **TypeScript** - Tipado estático
-- **Supabase** - Backend y base de datos
-- **Zustand** - Gestión de estado
-- **React Navigation** - Navegación
-- **React Query** - Gestión de datos
-- **Toast Messages** - Notificaciones
+### Para Barberos
+- ✂️ Perfil profesional personalizable
+- 📊 Gestión de agenda y disponibilidad
+- 📸 Publicación de Shorts con estilos de corte
+- 💬 Interacción con clientes
+- 📈 Estadísticas de servicios
 
-## 🛠️ Instalación
+### Para Administradores
+- 🏪 Gestión de barberías
+- 👥 Aprobación de barberos
+- 📊 Panel de control y estadísticas
+- ⚙️ Configuración de servicios
+
+## 🚀 Tecnologías
+
+- **Frontend**: React Native + Expo
+- **Backend**: Supabase (PostgreSQL)
+- **Navegación**: React Navigation
+- **Estado**: Zustand
+- **Estilos**: NativeWind (Tailwind CSS)
+- **Mapas**: React Native Maps
+- **Notificaciones**: Expo Notifications
+- **Media**: Expo AV, Expo Image Picker
+
+## 📦 Instalación
 
 ```bash
+# Clonar el repositorio
+git clone [url-del-repo]
+
 # Instalar dependencias
 npm install
 
-# Iniciar en desarrollo
-npx expo start
-
-# Limpiar caché
-npx expo start -c
-```
-
-## 🔐 Configuración de Supabase
-
-### Variables de Entorno
-
-Crea un archivo `.env` con:
-
-```env
-EXPO_PUBLIC_SUPABASE_URL=tu_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
-```
-
-### Scripts SQL Importantes
-
-Los scripts SQL están en la carpeta `supabase/`:
-
-- `setup-admin-system.sql` - Configuración inicial del sistema
-- `create-super-admin-user.sql` - Crear super administrador
-- `rls-policies.sql` - Políticas de seguridad
-- `storage-setup.sql` - Configuración de almacenamiento
-
-## 📱 Recuperación de Contraseña
-
-La página web para recuperación de contraseña está en `public/index.html`.
-
-### Deployment en Vercel
-
-```bash
-cd public
-vercel --prod
-```
-
-Luego configura la URL en Supabase:
-- Authentication → URL Configuration → Redirect URLs
-- Agrega: `https://tu-proyecto.vercel.app/`
-
-## 👥 Roles de Usuario
-
-### Cliente
-- Ver barberías y barberos
-- Reservar citas
-- Ver historial de citas
-- Gestionar perfil
-
-### Barbero
-- Ver citas asignadas
-- Gestionar disponibilidad
-- Ver historial de clientes
-
-### Admin
-- Gestionar barberos
-- Ver estadísticas de la barbería
-- Configurar servicios
-
-### Super Admin
-- Gestión completa de barberías
-- Gestión de todos los usuarios
-- Estadísticas globales
-- Configuración del sistema
-
-## 📂 Estructura del Proyecto
-
-```
-src/
-├── components/     # Componentes reutilizables
-├── hooks/          # Custom hooks
-├── navigation/     # Configuración de navegación
-├── screens/        # Pantallas de la app
-│   ├── auth/       # Autenticación
-│   ├── client/     # Cliente
-│   ├── barber/     # Barbero
-│   ├── admin/      # Admin
-│   └── superadmin/ # Super Admin
-├── services/       # Servicios (API, auth, etc.)
-├── store/          # Estado global (Zustand)
-├── styles/         # Estilos y temas
-├── supabase/       # Configuración de Supabase
-├── types/          # Tipos de TypeScript
-└── utils/          # Utilidades
-
-supabase/           # Scripts SQL
-public/             # Página web de recuperación
-```
-
-## 🎨 Notificaciones Toast
-
-Usa el helper `showToast` para notificaciones profesionales:
-
-```typescript
-import { showToast } from './src/utils/toast';
-
-// Éxito
-showToast.success('Operación completada', '✅ Éxito');
-
-// Error
-showToast.error('Algo salió mal', '❌ Error');
-
-// Info
-showToast.info('Información importante', 'ℹ️ Info');
-
-// Cargando
-showToast.loading('Procesando...');
-```
-
-## 🔧 Scripts Útiles
-
-```bash
-# Desarrollo
+# Iniciar la aplicación
 npm start
-
-# Limpiar caché
-npm start -- --clear
-
-# Android
-npm run android
-
-# iOS
-npm run ios
-
-# Web
-npm run web
 ```
 
-## 📝 Notas Importantes
+## 🎨 Diseño
 
-- Las políticas RLS están configuradas para seguridad
-- Los usuarios deben verificar su email al registrarse
-- Las contraseñas están encriptadas con bcrypt
-- Los enlaces de recuperación expiran en 1 hora
+La aplicación cuenta con:
+- Diseño moderno y minimalista
+- Modo claro y oscuro
+- Animaciones fluidas
+- Interfaz intuitiva
+- Componentes reutilizables
 
-## 🐛 Solución de Problemas
+## 📱 Pantallas Principales
 
-### Error al iniciar sesión
-- Verifica que las políticas RLS estén configuradas
-- Ejecuta `supabase/rls-policies.sql`
+1. **Autenticación**
+   - Login con diseño moderno
+   - Registro para clientes y barberos
+   - Verificación de email
+   - Recuperación de contraseña
 
-### Error de recursión infinita
-- Las políticas RLS están mal configuradas
-- Ejecuta el script de limpieza de políticas
+2. **Home**
+   - Búsqueda de barberías
+   - Mapa interactivo
+   - Barberías destacadas
 
-### Email de recuperación no llega
-- Verifica la configuración de SMTP en Supabase
-- Revisa la carpeta de spam
-- Verifica que el email esté registrado
+3. **Shorts**
+   - Feed de videos verticales
+   - Likes y comentarios
+   - Perfil del barbero
 
-## 📄 Licencia
+4. **Reservas**
+   - Calendario de disponibilidad
+   - Selección de servicios
+   - Confirmación de citas
 
-Este proyecto es privado y confidencial.
+5. **Perfil**
+   - Información personal
+   - Historial de citas
+   - Configuración
 
-## 👨‍💻 Desarrollo
+## 🔐 Seguridad
 
-Desarrollado con ❤️ para gestión profesional de barberías.
+- Autenticación con Supabase Auth
+- Row Level Security (RLS) en base de datos
+- Validación de datos en cliente y servidor
+- Tokens JWT para sesiones
+
+## 📄 Documentación Adicional
+
+- [Configuración de Google Maps](GOOGLE_MAPS_SETUP.md)
+- [Inicio Rápido - Ubicación](INICIO_RAPIDO_UBICACION.md)
+- [Implementación de Shorts](SHORTS_IMPLEMENTACION.md)
+- [Mejoras en UI de Autenticación](MEJORAS_AUTH_UI.md)
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas. Por favor, abre un issue primero para discutir los cambios que te gustaría hacer.
+
+## 📝 Licencia
+
+[Especificar licencia]
+
+## 👥 Equipo
+
+Desarrollado con ❤️ para revolucionar la experiencia de las barberías.
 
 ---
 
-**Versión**: 1.0.0  
-**Última actualización**: 2025-01-05
+**Trimly** - Tu barbería en un toque ✂️

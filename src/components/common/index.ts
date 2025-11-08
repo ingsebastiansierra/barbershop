@@ -9,3 +9,4 @@ export { Avatar } from './Avatar';
 export { Modal } from './Modal';
 export { TimePicker } from './TimePicker';
 export { AnimatedTabBar } from './AnimatedTabBar';
+export { SuccessModal } from './SuccessModal';

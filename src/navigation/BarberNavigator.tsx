@@ -29,6 +29,9 @@ import { BarberShortsScreen } from '../screens/barber/BarberShortsScreen';
 import { UploadShortScreen } from '../screens/barber/UploadShortScreen';
 import { ShortDetailScreen } from '../screens/barber/ShortDetailScreen';
 
+// Chat Screens
+import { ConversationsScreen, ChatScreen } from '../screens/common';
+
 const Tab = createBottomTabNavigator<BarberTabParamList>();
 const Stack = createNativeStackNavigator<BarberStackParamList>();
 
@@ -88,6 +91,16 @@ const BarberTabs: React.FC = () => {
           title: 'Shorts',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="film-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={ConversationsScreen}
+        options={{
+          title: 'Mensajes',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubbles-outline" size={size} color={color} />
           ),
         }}
       />
@@ -191,6 +204,14 @@ export const BarberNavigator: React.FC = () => {
         component={ShortDetailScreen}
         options={{
           title: 'Detalle del Short',
+          headerBackTitle: 'Atrás',
+        }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          headerShown: true,
           headerBackTitle: 'Atrás',
         }}
       />

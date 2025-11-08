@@ -146,6 +146,80 @@ export const BarberProfileScreen: React.FC = () => {
     }
   };
 
+  const handleChangeAvatar = () => {
+    Alert.alert(
+      'Cambiar Foto de Perfil',
+      'Selecciona una opción',
+      [
+        {
+          text: 'Tomar Foto',
+          onPress: handleTakePhoto,
+        },
+        {
+          text: 'Elegir de Galería',
+          onPress: handlePickFromGallery,
+        },
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  const handleTakePhoto = async () => {
+    try {
+      if (!user?.id) return;
+
+      showToast('loading', 'Tomando foto...');
+      
+      const { profileService } = await import('../../services/profileService');
+      const newAvatarUrl = await profileService.takeProfilePhoto(
+        user.id,
+        user.avatar_url
+      );
+
+      // Actualizar el estado local
+      if (updateProfile) {
+        await updateProfile({ avatar_url: newAvatarUrl });
+      }
+
+      showToast('success', 'Foto de perfil actualizada 📸');
+    } catch (error: any) {
+      console.error('Error taking photo:', error);
+      showToast('error', error.message || 'No se pudo actualizar la foto');
+    }
+  };
+
+  const handlePickFromGallery = async () => {
+    try {
+      if (!user?.id) return;
+
+      showToast('loading', 'Subiendo foto...');
+      
+      const { profileService } = await import('../../services/profileService');
+      const newAvatarUrl = await profileService.changeProfilePhoto(
+        user.id,
+        user.avatar_url
+      );
+
+      // Actualizar el estado local
+      if (updateProfile) {
+        await updateProfile({ avatar_url: newAvatarUrl });
+      }
+
+      showToast('success', 'Foto de perfil actualizada ✨');
+    } catch (error: any) {
+      console.error('Error picking photo:', error);
+      
+      if (error.message === 'No se seleccionó ninguna imagen') {
+        return; // Usuario canceló
+      }
+      
+      showToast('error', error.message || 'No se pudo actualizar la foto');
+    }
+  };
+
   const handleSaveSchedule = async () => {
     if (!user?.id) return;
 
@@ -231,12 +305,17 @@ export const BarberProfileScreen: React.FC = () => {
     >
       {/* Avatar Section */}
       <View style={styles.avatarSection}>
-        <Avatar uri={user.avatar_url} name={fullName} size="xl" />
+        <TouchableOpacity onPress={handleChangeAvatar} activeOpacity={0.7}>
+          <Avatar uri={user?.avatar_url} name={fullName} size="xl" />
+          <View style={[styles.editBadge, { backgroundColor: colors.primary }]}>
+            <Text style={styles.editBadgeText}>✏️</Text>
+          </View>
+        </TouchableOpacity>
         <Text style={[styles.name, { color: colors.textPrimary }]}>
           {fullName}
         </Text>
         <Text style={[styles.email, { color: colors.textSecondary }]}>
-          {user.email}
+          {user?.email}
         </Text>
       </View>
 
@@ -500,6 +579,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.xl,
     paddingVertical: spacing.lg,
+    position: 'relative',
+  },
+  editBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  editBadgeText: {
+    fontSize: 14,
   },
   name: {
     ...typography.h2,
